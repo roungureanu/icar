@@ -1,0 +1,5 @@
+*.log
+*.bak
+.idea
+__pycache__
+logs           
