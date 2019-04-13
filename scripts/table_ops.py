@@ -3,13 +3,28 @@ import operator
 
 class TableOps:
     def __init__(self, database, table, metadata):
-        self.database = database
-        self.table = table
-        self.metadata_file = metadata
-        self.preprocess()
+        if self.check_db_params(database, table, metadata):
+            self.database = database
+            self.table = table
+            self.metadata_file = metadata
+            self.preprocess()
+        else:
+            exit()
         
-        # set table
-        # comment functions
+    def check_db_params(self, database, table, metadata):
+        if not os.path.isdir(database):
+            print("Error: The path for the database you indicated does not exist or is not a folder.")
+            return False
+        if not os.path.isfile(os.path.join(database, table)):
+            print("Error: The path for the table you indicated does not exist or is not a file.")
+            return False
+        if not os.path.isfile(os.path.join(database, metadata)):
+            print("Error: The path for the metadata file you indicated does not exist or is not a file.")
+            return False
+        return True
+        
+    def set_table(self, database, table, metadata):
+        self.__init__(database, table, metadata)
 
     def preprocess(self):
         tb_path = os.path.join(self.database, self.table)
@@ -17,69 +32,95 @@ class TableOps:
         self.columns = {}
         self.lines = []
         self.metadata = {}
+        no_cols = -1
         for line_no, line in enumerate(open(tb_path, 'rt').readlines()):
             if line_no == 0:
                 header = line.strip().split(',')
+                no_cols = len(header)
                 for i, name in enumerate(header):
                     self.columns[name] = i
                 continue
             values = line.strip().split(',')
+            if no_cols != len(values):
+                print("Error: The table has inconsistent format.")
+                return
             self.lines.append(values)
         for line_no, line in enumerate(open(md_path, 'rt').readlines()):
             values = line.strip().split(',')
             self.metadata[values[0]] = values[1:]
+        if len(self.columns) != len(self.metadata):
+            print("Error: The metadata file is not consistent with the table file.")
+            return
+        for name in self.metadata:
+            if name not in self.columns:
+                print("Error: The metadata file is not consistent with the table file.")
+        
             
     def bool_op(self, line_value, th_value, operator, data_type):
+        # check for invalid operator or datatype
         line_value = eval(data_type + "(" + str(line_value) + ")")
         th_value = eval(data_type + "(" + str(th_value) + ")")
         if operator == 'eq':
             return line_value == th_value
-        if operator == 'le':
+        elif operator == 'le':
             return line_value <= th_value
-        if operator == 'ge':
+        elif operator == 'ge':
             return line_value >= th_value
-        if operator == 'lt':
+        elif operator == 'lt':
             return line_value < th_value
-        if operator == 'gt':
+        elif operator == 'gt':
             return line_value > th_value
-        if operator == 'ne':
+        elif operator == 'ne':
             return line_value != th_value
+        else:
+            print('Error: Invalid operator ' + operator + '. The accepted operators are: eq, le, ge, lt, gt, ne.')
+            exit()
                 
     def apply_filter(self, result, fname, fvalue, operator, first):
-        value = fvalue['value']            
-        if operator == 'or' or operator == '':
-            for line in self.lines:
-                if self.bool_op(line[self.columns[fname]],
-                                     value, fvalue['operator'],
-                                     self.metadata[fname][0]):
-                        if result is None:
-                            result = []
-                        result.append(line)
-        if operator == 'and':
-            if result is None and not first:
-                return result
-            if first:
+        value = fvalue['value']
+        try:
+            if fname not in self.columns:
+                raise("The name " + fname + "is not a valid column name.")
+            if operator == 'or' or operator == '':
                 for line in self.lines:
                     if self.bool_op(line[self.columns[fname]],
-                                     value, fvalue['operator'],
-                                     self.metadata[fname][0]):
+                                         value, fvalue['operator'],
+                                         self.metadata[fname][0]):
                             if result is None:
                                 result = []
                             result.append(line)
+            elif operator == 'and':
+                if result is None and not first:
+                    return result
+                if first:
+                    for line in self.lines:
+                        if self.bool_op(line[self.columns[fname]],
+                                         value, fvalue['operator'],
+                                         self.metadata[fname][0]):
+                                if result is None:
+                                    result = []
+                                result.append(line)
+                else:
+                    elim = []
+                    for i, line in enumerate(result):
+                        if not self.bool_op(line[self.columns[fname]],
+                                         value, fvalue['operator'],
+                                         self.metadata[fname][0]):
+                                elim.append(i)
+                    for line_no in elim:
+                        del result[line_no]
             else:
-                elim = []
-                for i, line in enumerate(result):
-                    if not self.bool_op(line[self.columns[fname]],
-                                     value, fvalue['operator'],
-                                     self.metadata[fname][0]):
-                            elim.append(i)
-                for line_no in elim:
-                    del result[line_no]
+                raise Exception("Wrong value for the operator between the clauses of where.")
+        except Exception as error:
+                print('Error: ' + repr(error))
         return result
    
     def where(self, filters, operation):
         result = []
         first = True
+        if 'op_bool' not in filters:
+            print('Error: The operator op_bool is missing from the filters dictionary. If there is just one operation, make it an empty string.')
+            return
         for fname, fvalue in filters.items():
             if fname != 'op_bool':
                 result = self.apply_filter(result, fname, fvalue,
@@ -93,6 +134,19 @@ class TableOps:
                 line_no = self.is_line(line, self.lines)
                 if line_no > -1:
                     del self.lines[line_no]
+        
+    def is_valid(self, val, col):
+        md = self.metadata[col]
+        try:
+            _ = eval(md[0] + '(' + str(val) + ')')
+        except:
+            print("Error: The value for the column " + col + " should be of type " + md[0] + '.')
+            return False
+        if len(md) > 1 and int(md[1]) > 0:
+            if len(val) > int(md[1]):
+                print("Error: The value for the column " + col + " sould have the length " + str(md[1]) + '.')
+                return False
+        return True
                     
     def is_line(self, line, matrix):
         index = -1
@@ -123,33 +177,60 @@ class TableOps:
                 line_no = self.is_line(line, self.lines)
                 if line_no > -1:
                     for val, col in zip(vals, cols):
-                        self.lines[line_no][self.columns[col]] = val
+                        if self.is_valid(val, col):
+                            self.lines[line_no][self.columns[col]] = val
+                        else:
+                            return None
         self.result = new_result    
         return new_result
-        
+    
+    # performs a select operation
+    # @param filters = a dictionary with the params used for where
+    # @param cols = an array with the columns written after select in the statement
+    # @return result = list of lists, the results of the select(the indicated lines and columns)
     def select(self, filters, cols):
         self.where(filters, 'select')
         self.filter_columns(cols)
         return self.result
         
+    # performs a delete operation
+    # @param filters  = a dict with the params used for where
+    # @return lines = list of lists, the data of the table after the indicated lines were deleted
     def delete(self, filters):
         self.where(filters, 'delete')
+        self.commit()
         return self.lines
         
+    # performs an insert operation
+    # @param cols = an array with the column names where values will be inserted, can be ['*']
+    # @param vals = an array with the corresponding values
+    # @return lines = list of lists, the data of the table after the new values were inserted
     def insert(self, cols, vals):
         if cols[0] == '*':
             self.lines.append(vals)
-            return
+            return self.lines
         new_line = [None for _ in range(len(self.columns))]
         for val, col in zip(vals, cols):
-            new_line[self.columns[col]] = val
+            if self.is_valid(val, col):
+                new_line[self.columns[col]] = val
+            else:
+                print(val, col)
+                return None
         self.lines.append(new_line)
+        self.commit()
+        return self.lines
         
+    # performs a select operation
+    # @param filters = a dictionary with the params used for where
+    # @param cols = an array with the columns written after select in the statement
+    # @return lines = list of lists, the data of the table after the indicated entries were updated
     def update(self, filters, cols, vals):
         self.where(filters, 'select')
         self.filter_columns(cols, vals)
+        self.commit()
         return self.lines
         
+    # writes the data in memory to the table(overwrites it)
     def commit(self):
         tb_path = os.path.join(self.database, self.table)
         f = open(tb_path, 'wt')
@@ -163,13 +244,40 @@ class TableOps:
         f.close()
              
 
-filters = {'melci': {'operator': 'eq',
-                         'value': 1},
-               'op_bool': ''}  
-cols = ['melci']
-vals = ['9']
+if __name__ == "__main__":
+    filters = {'melci': {'operator': 'eq',
+                             'value': 1},
+                   'op_bool': ''}  
+    cols = ['*']
+    vals = [2, 4, 3, 6]
 
-table_ops = TableOps('.', 'tb1.txt', 'tb1.metadata')
-table_ops.delete(filters)
-print(table_ops.lines)
-table_ops.commit()
+    table_ops = TableOps('.', 'tb1.txt', 'tb1.metadata')
+    print(table_ops.lines)
+    print('')
+    print('select * where melci=1')
+    print(table_ops.select(filters, cols))
+    print('')
+
+    filters = {'scoici': {'operator': 'gt',
+                             'value': 5},
+                   'op_bool': ''} 
+    print(table_ops.lines)
+    print('')
+    print('delete where scoici>5')
+    print(table_ops.delete(filters))
+    print('')
+
+    print(table_ops.lines)
+    print('')
+    print('insert (2, 4, 3, 6)')
+    print(table_ops.insert(cols, vals))
+    print('')
+
+    filters = {'melci': {'operator': 'eq',
+                             'value': 1},
+                   'op_bool': ''}  
+    print(table_ops.lines)
+    print('')
+    print('update * where melci=1 newvalues (2, 4, 3, 6)')
+    print(table_ops.update(filters, cols, vals))
+    print('')
