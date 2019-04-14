@@ -1,5 +1,7 @@
 import os
 import operator
+import icar.core.xml_parser
+
 
 class TableOps:
     def __init__(self, database, table, metadata):
@@ -242,6 +244,113 @@ class TableOps:
             line1 = ''.join(str(value) + ',' for value in line)
             f.write(line1[:-1] + '\n')
         f.close()
+
+    def export(self, destination_path):
+        metadata_node = icar.core.xml_parser.Node(
+            'table_metadata',
+            [
+                icar.core.xml_parser.Node(
+                    'column',
+                    [
+                        icar.core.xml_parser.Node(
+                            'name',
+                            [icar.core.xml_parser.TextNode(column_name)]
+                        ),
+                        icar.core.xml_parser.Node(
+                            'type',
+                            [icar.core.xml_parser.TextNode(column_type)]
+                        ),
+                        icar.core.xml_parser.Node(
+                            'size',
+                            [icar.core.xml_parser.TextNode(column_size)]
+                        ),
+                    ]
+                )
+                for column_name, (column_type, column_size) in self.metadata.items()
+            ]
+        )
+        content_node = icar.core.xml_parser.Node(
+            'table_entries',
+            [
+                icar.core.xml_parser.Node(
+                    'entry',
+                    [
+                        icar.core.xml_parser.Node(
+                            'value',
+                            [icar.core.xml_parser.TextNode(value)]
+                        )
+                        for value in entry
+                    ]
+                )
+                for entry in self.lines
+            ]
+        )
+
+        tree = icar.core.xml_parser.Node(
+            'root',
+            [
+                metadata_node,
+                content_node
+            ]
+        )
+
+        with open(destination_path, 'w') as handle:
+            handle.write(tree.dumps())
+
+    def validate_import_xml(self, tree: icar.core.xml_parser.Node):
+        if len(tree.children) != 2:
+            raise Exception('Tree has more than 2 nodes')
+
+        metadata_node, entries_node = tree.children
+
+        if metadata_node.element != 'table_metadata':
+            raise Exception('First node is not a table_metadata node.')
+
+        if entries_node.element != 'table_entries':
+            raise Exception('Second node is not a table_entries node.')
+
+        table_metadata = [
+            {
+                node.element: node.children[0].text
+                for node in column_node.children
+            }
+            for column_node in metadata_node.children
+        ]
+
+        for entry in table_metadata:
+            if {'name', 'type', 'size'}.difference(entry):
+                raise Exception('Column entries have missing fields. Required fields are: name, type and size.')
+
+    def import_(self, source_path):
+        parser = icar.core.xml_parser.Parser(source_path)
+        tree = parser.tree
+
+        self.validate_import_xml(tree)
+        metadata_node, entries_node = tree.children
+
+        table_metadata = [
+            {
+                node.element: node.children[0].text
+                for node in column_node.children
+            }
+            for column_node in metadata_node.children
+        ]
+
+        metadata = {
+            column['name']: [column['type'], column['size']]
+            for column in table_metadata
+        }
+
+        entries = [
+            [
+                value_node.children[0]
+                for value_node in entry_node.children
+            ]
+            for entry_node in entries_node.children
+        ]
+
+        # TODO: call create table with metadata and entries here :(
+        pass
              
 
 if __name__ == "__main__":
@@ -249,35 +358,38 @@ if __name__ == "__main__":
                              'value': 1},
                    'op_bool': ''}  
     cols = ['*']
+    # cols = ['scoici', 'raci']
     vals = [2, 4, 3, 6]
 
-    table_ops = TableOps('.', 'tb1.txt', 'tb1.metadata')
-    print(table_ops.lines)
-    print('')
-    print('select * where melci=1')
-    print(table_ops.select(filters, cols))
-    print('')
+    table_ops = TableOps('.', r'..\resources\tb1.txt', r'..\resources\tb1.metadata')
+    table_ops.export(r'..\resources\export.xml')
+    table_ops.import_(r'..\resources\export.xml')
+    # print(table_ops.lines)
+    # print('')
+    # print('select * where melci=1')
+    # print(table_ops.select(filters, cols))
+    # print('')
 
-    filters = {'scoici': {'operator': 'gt',
-                             'value': 5},
-                   'op_bool': ''} 
-    print(table_ops.lines)
-    print('')
-    print('delete where scoici>5')
-    print(table_ops.delete(filters))
-    print('')
+    # filters = {'scoici': {'operator': 'gt',
+    #                          'value': 5},
+    #                'op_bool': ''}
+    # print(table_ops.lines)
+    # print('')
+    # print('delete where scoici>5')
+    # print(table_ops.delete(filters))
+    # print('')
+    #
+    # print(table_ops.lines)
+    # print('')
+    # print('insert (2, 4, 3, 6)')
+    # print(table_ops.insert(cols, vals))
+    # print('')
 
-    print(table_ops.lines)
-    print('')
-    print('insert (2, 4, 3, 6)')
-    print(table_ops.insert(cols, vals))
-    print('')
-
-    filters = {'melci': {'operator': 'eq',
-                             'value': 1},
-                   'op_bool': ''}  
-    print(table_ops.lines)
-    print('')
-    print('update * where melci=1 newvalues (2, 4, 3, 6)')
-    print(table_ops.update(filters, cols, vals))
-    print('')
+    # filters = {'melci': {'operator': 'eq',
+    #                          'value': 1},
+    #                'op_bool': ''}
+    # print(table_ops.lines)
+    # print('')
+    # print('update * where melci=1 newvalues (2, 4, 3, 6)')
+    # print(table_ops.update(filters, cols, vals))
+    # print('')
