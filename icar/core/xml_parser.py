@@ -1,3 +1,6 @@
+import os
+import icar.helpers.constants as constants
+
 class Node(object):
     def __init__(self, element, children):
         self.element = element
@@ -94,7 +97,7 @@ class Parser(object):
 
 
 if __name__ == '__main__':
-    parser = Parser(r'D:\Facultate\Work\CalitateaSistemelorSoftware\icar\resources\test.xml')
+    path = os.path.join(constants.RESOURCES_FOLDER_PATH, 'export.xml')
+    parser = Parser(path)
     print(parser.tree.children)
     print(parser.dumps())
-    print(parser.tree.children)

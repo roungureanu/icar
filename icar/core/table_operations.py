@@ -1,41 +1,44 @@
 import os
 import operator
+from distutils.command.config import config
+
 import icar.core.xml_parser
+import icar.helpers.constants as constants
+import icar.core.database_operations
 
 
 class TableOps:
-    def __init__(self, database, table, metadata):
-        if self.check_db_params(database, table, metadata):
-            self.database = database
-            self.table = table
-            self.metadata_file = metadata
+    def __init__(self, database_name, table_name):
+        self.database_file_path = os.path.join(constants.DATABASES_PATH, database_name.upper())
+        self.table_file_path = os.path.join(self.database_file_path, '{}.csv'.format(table_name))
+        self.table_metadata_file_path = os.path.join(self.database_file_path, '{}.metadata'.format(table_name))
+
+        if self.check_db_params():
             self.preprocess()
         else:
             exit()
         
-    def check_db_params(self, database, table, metadata):
-        if not os.path.isdir(database):
+    def check_db_params(self):
+        if not os.path.isdir(self.database_file_path):
             print("Error: The path for the database you indicated does not exist or is not a folder.")
             return False
-        if not os.path.isfile(os.path.join(database, table)):
+        if not os.path.isfile(self.table_file_path):
             print("Error: The path for the table you indicated does not exist or is not a file.")
             return False
-        if not os.path.isfile(os.path.join(database, metadata)):
+        if not os.path.isfile(self.table_metadata_file_path):
             print("Error: The path for the metadata file you indicated does not exist or is not a file.")
             return False
         return True
         
     def set_table(self, database, table, metadata):
-        self.__init__(database, table, metadata)
+        self.__init__(database, table)
 
     def preprocess(self):
-        tb_path = os.path.join(self.database, self.table)
-        md_path = os.path.join(self.database, self.metadata_file)
         self.columns = {}
         self.lines = []
         self.metadata = {}
         no_cols = -1
-        for line_no, line in enumerate(open(tb_path, 'rt').readlines()):
+        for line_no, line in enumerate(open(self.table_file_path, 'rt').readlines()):
             if line_no == 0:
                 header = line.strip().split(',')
                 no_cols = len(header)
@@ -47,7 +50,7 @@ class TableOps:
                 print("Error: The table has inconsistent format.")
                 return
             self.lines.append(values)
-        for line_no, line in enumerate(open(md_path, 'rt').readlines()):
+        for line_no, line in enumerate(open(self.table_metadata_file_path, 'rt').readlines()):
             values = line.strip().split(',')
             self.metadata[values[0]] = values[1:]
         if len(self.columns) != len(self.metadata):
@@ -56,8 +59,7 @@ class TableOps:
         for name in self.metadata:
             if name not in self.columns:
                 print("Error: The metadata file is not consistent with the table file.")
-        
-            
+
     def bool_op(self, line_value, th_value, operator, data_type):
         # check for invalid operator or datatype
         line_value = eval(data_type + "(" + str(line_value) + ")")
@@ -85,29 +87,35 @@ class TableOps:
                 raise("The name " + fname + "is not a valid column name.")
             if operator == 'or' or operator == '':
                 for line in self.lines:
-                    if self.bool_op(line[self.columns[fname]],
-                                         value, fvalue['operator'],
-                                         self.metadata[fname][0]):
-                            if result is None:
-                                result = []
-                            result.append(line)
+                    if self.bool_op(
+                        line[self.columns[fname]],
+                        value, fvalue['operator'],
+                        self.metadata[fname][0]
+                    ):
+                        if result is None:
+                            result = []
+                        result.append(line)
             elif operator == 'and':
                 if result is None and not first:
                     return result
                 if first:
                     for line in self.lines:
-                        if self.bool_op(line[self.columns[fname]],
-                                         value, fvalue['operator'],
-                                         self.metadata[fname][0]):
+                        if self.bool_op(
+                            line[self.columns[fname]],
+                            value, fvalue['operator'],
+                            self.metadata[fname][0]
+                        ):
                                 if result is None:
                                     result = []
                                 result.append(line)
                 else:
                     elim = []
                     for i, line in enumerate(result):
-                        if not self.bool_op(line[self.columns[fname]],
-                                         value, fvalue['operator'],
-                                         self.metadata[fname][0]):
+                        if not self.bool_op(
+                            line[self.columns[fname]],
+                            value, fvalue['operator'],
+                            self.metadata[fname][0]
+                        ):
                                 elim.append(i)
                     for line_no in elim:
                         del result[line_no]
@@ -121,12 +129,16 @@ class TableOps:
         result = []
         first = True
         if 'op_bool' not in filters:
-            print('Error: The operator op_bool is missing from the filters dictionary. If there is just one operation, make it an empty string.')
+            print(
+                'Error: The operator op_bool is missing from the filters dictionary. '
+                'If there is just one operation, make it an empty string.'
+            )
             return
         for fname, fvalue in filters.items():
             if fname != 'op_bool':
-                result = self.apply_filter(result, fname, fvalue,
-                                                   filters['op_bool'], first)
+                result = self.apply_filter(
+                    result, fname, fvalue, filters['op_bool'], first
+                )
             first = False
         if operation == 'select':
             self.result = result
@@ -141,7 +153,7 @@ class TableOps:
         md = self.metadata[col]
         try:
             _ = eval(md[0] + '(' + str(val) + ')')
-        except:
+        except Exception:
             print("Error: The value for the column " + col + " should be of type " + md[0] + '.')
             return False
         if len(md) > 1 and int(md[1]) > 0:
@@ -167,7 +179,7 @@ class TableOps:
     def filter_columns(self, cols, vals=None):
         if self.result is None:
             return None
-        if len(cols) == 1 and cols[0] == '*' and vals == None:
+        if len(cols) == 1 and cols[0] == '*' and vals is None:
             return self.result
         new_result = []
         for line in self.result:
@@ -234,8 +246,7 @@ class TableOps:
         
     # writes the data in memory to the table(overwrites it)
     def commit(self):
-        tb_path = os.path.join(self.database, self.table)
-        f = open(tb_path, 'wt')
+        f = open(self.table_file_path, 'wt')
         sorted_names = sorted(self.columns.items(), key=operator.itemgetter(1))
         sorted_names = [name for (name, _) in sorted_names]
         line1 = ''.join(name + ',' for name in sorted_names)
@@ -354,20 +365,28 @@ class TableOps:
              
 
 if __name__ == "__main__":
-    filters = {'melci': {'operator': 'eq',
-                             'value': 1},
-                   'op_bool': ''}  
+    filters = {
+        'melci': {
+            'operator': 'eq',
+            'value': 1
+        },
+        'op_bool': ''
+    }
     cols = ['*']
     # cols = ['scoici', 'raci']
     vals = [2, 4, 3, 6]
 
-    table_ops = TableOps('.', r'..\resources\tb1.txt', r'..\resources\tb1.metadata')
-    table_ops.export(r'..\resources\export.xml')
-    table_ops.import_(r'..\resources\export.xml')
+    export_path = os.path.join(
+        constants.RESOURCES_FOLDER_PATH, 'export.xml'
+    )
+
+    table_ops = TableOps('yet_another_test_db', 'my_table')
+    table_ops.export(export_path)
+    # table_ops.import_(export_path)
     # print(table_ops.lines)
     # print('')
     # print('select * where melci=1')
-    # print(table_ops.select(filters, cols))
+    print(table_ops.select(filters, cols))
     # print('')
 
     # filters = {'scoici': {'operator': 'gt',

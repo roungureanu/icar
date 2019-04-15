@@ -14,3 +14,11 @@ RESOURCES_FOLDER_PATH = os.path.join(ROOT, 'resources')
 
 LOGS_FOLDER_PATH = os.path.join(ROOT, 'logs')
 LOGGER_CONFIG_PATH = os.path.join(RESOURCES_FOLDER_PATH, 'logger_config.json')
+
+DATABASES_PATH = os.path.join(ROOT, 'databases')
+
+VALID_TYPES = {
+    'TEXT': 'TEXT',
+    'NUMERIC': 'NUMERIC',
+    'BOOLEAN': 'BOOLEAN'
+}
