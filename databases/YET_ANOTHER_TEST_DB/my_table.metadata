@@ -1,4 +1,4 @@
-melci,int,0
-scoici,int,0
-raci,int,0
-craci,int,0
+melci,NUMERIC,0
+scoici,NUMERIC,0
+raci,NUMERIC,0
+craci,NUMERIC,0
