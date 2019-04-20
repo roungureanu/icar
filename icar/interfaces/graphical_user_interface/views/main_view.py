@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.ttk as ttk
 
 import icar.core.database_operations
 import icar.interfaces.graphical_user_interface.core.base_view as base_view
@@ -10,6 +11,8 @@ import icar.interfaces.graphical_user_interface.views.insert_record_view as inse
 import icar.interfaces.graphical_user_interface.views.browse_records_view as browse_records_view
 import icar.interfaces.graphical_user_interface.views.delete_records_view as delete_records_view
 import icar.interfaces.graphical_user_interface.views.update_records_view as update_records_view
+import icar.interfaces.graphical_user_interface.views.export_table_view as export_table_view
+import icar.interfaces.graphical_user_interface.views.import_table_view as import_table_view
 
 
 class _Menu(tk.Frame):
@@ -89,29 +92,39 @@ class _Menu(tk.Frame):
                 # self.rename_table.grid(row=0, column=5)
 
             if self.app.current_open_table:
-                self.insert_record_button = tk.Button(
-                    self, text='Insert Record',
-                    command=lambda: self.app.replace_frame(insert_record_view.InsertRecordView(self.app))
+                self.table_operation_menu_variable = tk.StringVar(self, 'Table Manipulation')
+                self.table_operation_menu_variable.trace(
+                    'w',
+                    self.table_operation_menu_callback
                 )
-                self.insert_record_button.grid(row=0, column=6)
+                self.table_operations_menu = tk.OptionMenu(
+                    self,
+                    self.table_operation_menu_variable,
+                    *[
+                        'Insert Record',
+                        'Browse Records',
+                        'Delete Records',
+                        'Update Records',
+                        'Export',
+                        'Import'
+                    ]
+                )
+                self.table_operations_menu.grid(row=0, column=6)
 
-                self.browse_records_button = tk.Button(
-                    self, text='Browse Records',
-                    command=lambda: self.app.replace_frame(browse_records_view.BrowseRecordsView(self.app))
-                )
-                self.browse_records_button.grid(row=0, column=7)
-
-                self.delete_records_button = tk.Button(
-                    self, text='Delete Records',
-                    command=lambda: self.app.replace_frame(delete_records_view.DeleteRecordsView(self.app))
-                )
-                self.delete_records_button .grid(row=0, column=8)
-
-                self.update_records_button = tk.Button(
-                    self, text='Update Records',
-                    command=lambda: self.app.replace_frame(update_records_view.UpdateRecordsView(self.app))
-                )
-                self.update_records_button .grid(row=0, column=9)
+    def table_operation_menu_callback(self, *args):
+        option_picked = self.table_operation_menu_variable.get()
+        if option_picked == 'Insert Record':
+            self.app.replace_frame(insert_record_view.InsertRecordView(self.app))
+        elif option_picked == 'Browse Records':
+            self.app.replace_frame(browse_records_view.BrowseRecordsView(self.app))
+        elif option_picked == 'Delete Records':
+            self.app.replace_frame(delete_records_view.DeleteRecordsView(self.app))
+        elif option_picked == 'Update Records':
+            self.app.replace_frame(update_records_view.UpdateRecordsView(self.app))
+        elif option_picked == 'Export':
+            self.app.replace_frame(export_table_view.ExportTableView(self.app))
+        elif option_picked == 'Import':
+            self.app.replace_frame(import_table_view.ImportTableView(self.app))
 
 
 class _OperationResultMessage(tk.Frame):

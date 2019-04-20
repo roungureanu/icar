@@ -9,6 +9,9 @@ import icar.core.database_operations
 
 class TableOps:
     def __init__(self, database_name, table_name):
+        self.database_name = database_name
+        self.table_name = table_name
+
         self.database_file_path = os.path.join(constants.DATABASES_PATH, database_name.upper())
         self.table_file_path = os.path.join(self.database_file_path, '{}.csv'.format(table_name))
         self.table_metadata_file_path = os.path.join(self.database_file_path, '{}.metadata'.format(table_name))
@@ -247,6 +250,7 @@ class TableOps:
     def insert(self, cols, vals):
         if cols[0] == '*':
             self.lines.append(vals)
+            self.commit()
             return self.lines
         new_line = [None for _ in range(len(self.columns))]
         for val, col in zip(vals, cols):
@@ -372,10 +376,14 @@ class TableOps:
             for column_node in metadata_node.children
         ]
 
-        metadata = {
-            column['name']: [column['type'], column['size']]
-            for column in table_metadata
-        }
+        column_names = []
+        column_types = []
+        column_sizes = []
+
+        for column in table_metadata:
+            column_names.append(column['name'])
+            column_types.append(column['type'])
+            column_sizes.append(column['size'])
 
         entries = [
             [
@@ -386,8 +394,18 @@ class TableOps:
         ]
 
         # TODO: call create table with metadata and entries here :(
-        pass
-             
+        icar.core.database_operations.delete_table(self.database_name, self.table_name)
+        icar.core.database_operations.create_table(
+            self.database_name,
+            self.table_name,
+            column_names,
+            column_types,
+            column_sizes
+        )
+        self.preprocess()
+        for entry in entries:
+            self.insert(['*'], entry)
+
 
 if __name__ == "__main__":
     filters = {
