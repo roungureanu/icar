@@ -8,6 +8,8 @@ import icar.interfaces.graphical_user_interface.views.create_table_view as creat
 import icar.interfaces.graphical_user_interface.views.delete_table_view as delete_table_view
 import icar.interfaces.graphical_user_interface.views.insert_record_view as insert_record_view
 import icar.interfaces.graphical_user_interface.views.browse_records_view as browse_records_view
+import icar.interfaces.graphical_user_interface.views.delete_records_view as delete_records_view
+import icar.interfaces.graphical_user_interface.views.update_records_view as update_records_view
 
 
 class _Menu(tk.Frame):
@@ -95,9 +97,21 @@ class _Menu(tk.Frame):
 
                 self.browse_records_button = tk.Button(
                     self, text='Browse Records',
-                    command=None
+                    command=lambda: self.app.replace_frame(browse_records_view.BrowseRecordsView(self.app))
                 )
-                self.insert_record_button.grid(row=0, column=7)
+                self.browse_records_button.grid(row=0, column=7)
+
+                self.delete_records_button = tk.Button(
+                    self, text='Delete Records',
+                    command=lambda: self.app.replace_frame(delete_records_view.DeleteRecordsView(self.app))
+                )
+                self.delete_records_button .grid(row=0, column=8)
+
+                self.update_records_button = tk.Button(
+                    self, text='Update Records',
+                    command=lambda: self.app.replace_frame(update_records_view.UpdateRecordsView(self.app))
+                )
+                self.update_records_button .grid(row=0, column=9)
 
 
 class _OperationResultMessage(tk.Frame):

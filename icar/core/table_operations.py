@@ -169,11 +169,11 @@ class TableOps:
         md = self.metadata[col]
         try:
             if md[0].upper() == 'NUMERIC':
-                line_value = float(str(line_value))
+                line_value = float(str(val))
             elif md[0].upper() == 'TEXT':
-                line_value = str(line_value)
+                line_value = str(val)
             elif md[0].upper() == 'BOOLEAN':
-                line_value = bool(str(line_value))
+                line_value = bool(str(val))
             else:
                 print("Error: The data type" + md[0] + " is not supported by the database manager.")
                 return False

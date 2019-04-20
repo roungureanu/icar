@@ -29,8 +29,8 @@ def retrieve_centered_root():
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
 
-    application_width = 800
-    application_heigth = 200
+    application_width = 1000
+    application_heigth = 400
 
     x_position = int(screen_width / 2 - application_width / 2)
     y_position = int(screen_height / 3 - application_heigth / 2)

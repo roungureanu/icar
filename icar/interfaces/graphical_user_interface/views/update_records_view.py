@@ -7,7 +7,7 @@ import icar.interfaces.graphical_user_interface.core.base_view as base_view
 import icar.interfaces.graphical_user_interface.views.main_view
 
 
-class BrowseRecordsView(base_view.BaseView):
+class UpdateRecordsView(base_view.BaseView):
     def __init__(self, app):
         self.table_operations = icar.core.table_operations.TableOps(
             app.current_open_database,
@@ -21,20 +21,22 @@ class BrowseRecordsView(base_view.BaseView):
             for column_name in self.table_operations.columns
         }
 
-        super().__init__(app)
+        self.new_values = {
+            column_name: None
+            for column_name in self.table_operations.columns
+        }
 
-        self.lines = self.table_operations.lines
-        self.update_rows()
+        super().__init__(app)
 
     def create_widgets(self):
         tk.Label(
             self,
-            text='Viewing Table {}'.format(self.app.current_open_table)
+            text='Updating Table {}'.format(self.app.current_open_table)
         ).grid(row=0, column=0)
         tk.Button(
             self,
-            text='Filter',
-            command=self.filter_rows
+            text='Update',
+            command=self.update_records
         ).grid(row=0, column=1)
         tk.Button(
             self,
@@ -68,7 +70,13 @@ class BrowseRecordsView(base_view.BaseView):
 
             filters.grid(row=2, column=i + 1)
 
-    def filter_rows(self):
+        tk.Label(self, text='New Values').grid(row=4, column=0)
+        for i, column_name in enumerate(self.table_operations.columns.keys()):
+            tk.Label(self, text=column_name).grid(row=3, column=i + 1)
+            self.new_values[column_name] = tk.StringVar(self, '')
+            tk.Entry(self, textvariable=self.new_values[column_name]).grid(row=4, column=i + 1)
+
+    def update_records(self):
         operators_map = {
             '==': 'eq',
             '!=': 'ne',
@@ -77,8 +85,6 @@ class BrowseRecordsView(base_view.BaseView):
             '<=': 'le',
             '<': 'lt'
         }
-
-        self.records.destroy()
 
         filters = {
             'op_bool': self.operator_value.get()
@@ -93,29 +99,18 @@ class BrowseRecordsView(base_view.BaseView):
                     'value': value
                 }
 
-        self.lines = self.table_operations.select(filters, ['*'])
+        columns = []
+        values = []
 
-        self.update_rows()
+        for column in self.new_values:
+            value = self.new_values[column].get()
+            if value:
+                columns.append(column)
+                values.append(value)
 
-    def update_rows(self):
-        self.records = tk.Frame(self)
+        if columns:
+            self.table_operations.update(filters, columns, values)
 
-        canvas = tk.Canvas(self.records)
-        content_frame = tk.Frame(canvas)
-        scrollbar = tk.Scrollbar(self.records, orient="vertical", command=canvas.yview)
-
-        scrollbar.pack(side="right", fill="y")
-        canvas.pack(side="left", fill="both", expand=True)
-        canvas.create_window((100, 100), window=content_frame, anchor="nw")
-
-        content_frame.bind(
-            "<Configure>",
-            lambda event, canvas=canvas: canvas.configure(scrollregion=canvas.bbox("all"))
+        self.app.replace_frame(
+            icar.interfaces.graphical_user_interface.views.main_view.MainPage(self.app)
         )
-
-        for i, item in enumerate(self.lines):
-            for j, value in enumerate(item):
-                tk.Entry(content_frame, textvariable=tk.StringVar(self, value)).grid(row=i, column=j)
-
-        canvas.configure(yscrollcommand=scrollbar.set)
-        self.records.grid(row=3, columnspan=3)
