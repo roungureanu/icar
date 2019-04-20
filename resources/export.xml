@@ -2,17 +2,6 @@
     <table_metadata>
         <column>
             <name>
-                melci
-            </name>
-            <type>
-                int
-            </type>
-            <size>
-                0
-            </size>
-        </column>
-        <column>
-            <name>
                 scoici
             </name>
             <type>
@@ -25,6 +14,17 @@
         <column>
             <name>
                 raci
+            </name>
+            <type>
+                int
+            </type>
+            <size>
+                0
+            </size>
+        </column>
+        <column>
+            <name>
+                melci
             </name>
             <type>
                 int

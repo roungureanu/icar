@@ -17,7 +17,7 @@ LOGGER_CONFIG_PATH = os.path.join(RESOURCES_FOLDER_PATH, 'logger_config.json')
 
 DATABASES_PATH = os.path.join(ROOT, 'databases')
 
-VALID_TYPES = {
+VALID_COLUMN_TYPES = {
     'TEXT': 'TEXT',
     'NUMERIC': 'NUMERIC',
     'BOOLEAN': 'BOOLEAN'

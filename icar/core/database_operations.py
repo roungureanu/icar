@@ -22,6 +22,26 @@ def create_database(database_name):
     return (0, 'Success: Database created.')
 
 
+def database_exists(database_name):
+    return database_name.upper() in os.listdir(constants.DATABASES_PATH)
+
+
+def list_databases():
+    return os.listdir(constants.DATABASES_PATH)
+
+
+def list_tables(database_name):
+    tables = []
+
+    database_path = os.path.join(constants.DATABASES_PATH, database_name.upper())
+    for file_ in os.listdir(database_path):
+        full_path = os.path.join(database_path, file_)
+        if full_path.lower().endswith('.csv'):
+            tables.append(os.path.splitext(file_)[0].upper())
+
+    return tables
+
+
 # DELETE DATABASE *DATABASE_NAME*
 def delete_database(database_name):
     if type(database_name) != str and database_name.isalnum():
@@ -77,7 +97,7 @@ def create_table(database_name, table_name, columns, types, sizes):
         for i in range(len(columns)):
             types[i] = types[i].upper()
             columns[i] = columns[i].upper()
-            if types[i] not in constants.VALID_TYPES:
+            if types[i] not in constants.VALID_COLUMN_TYPES:
                 return (1, 'Error: Invalid type.')
             if type(sizes[i]) != int:
                 sizes[i] = 0
@@ -242,7 +262,7 @@ def add_column(database_name, table_name, column_name, column_type, column_size)
     table_name = table_name.upper()
     column_name = column_name.upper()
     column_type = column_type.upper()
-    if column_type not in constants.VALID_TYPES:
+    if column_type not in constants.VALID_COLUMN_TYPES:
         return (1, 'Error: Invalid type.')
     if type(column_size != int):
         column_size = 0
@@ -278,7 +298,7 @@ if __name__ == '__main__':
         'test_db',
         'test_table',
         ['string_column', 'numeric_column'],
-        [constants.VALID_TYPES['TEXT'], constants.VALID_TYPES['NUMERIC']],
+        [constants.VALID_COLUMN_TYPES['TEXT'], constants.VALID_COLUMN_TYPES['NUMERIC']],
         [100, 10]
     )
 
