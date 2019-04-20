@@ -2,32 +2,10 @@
     <table_metadata>
         <column>
             <name>
-                scoici
-            </name>
-            <type>
-                int
-            </type>
-            <size>
-                0
-            </size>
-        </column>
-        <column>
-            <name>
                 raci
             </name>
             <type>
-                int
-            </type>
-            <size>
-                0
-            </size>
-        </column>
-        <column>
-            <name>
-                melci
-            </name>
-            <type>
-                int
+                NUMERIC
             </type>
             <size>
                 0
@@ -38,7 +16,29 @@
                 craci
             </name>
             <type>
-                int
+                NUMERIC
+            </type>
+            <size>
+                0
+            </size>
+        </column>
+        <column>
+            <name>
+                scoici
+            </name>
+            <type>
+                NUMERIC
+            </type>
+            <size>
+                0
+            </size>
+        </column>
+        <column>
+            <name>
+                melci
+            </name>
+            <type>
+                NUMERIC
             </type>
             <size>
                 0

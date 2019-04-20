@@ -62,19 +62,35 @@ class TableOps:
 
     def bool_op(self, line_value, th_value, operator, data_type):
         # check for invalid operator or datatype
-        line_value = eval(data_type + "(" + str(line_value) + ")")
-        th_value = eval(data_type + "(" + str(th_value) + ")")
-        if operator == 'eq':
+        try:
+            if data_type.upper() == 'NUMERIC':
+                line_value = float(str(line_value))
+                th_value = float(str(th_value))
+            elif data_type.upper() == 'TEXT':
+                line_value = str(line_value)
+                th_value = str(str(th_value))
+            elif data_type.upper() == 'BOOLEAN':
+                line_value = bool(str(line_value))
+                th_value = bool(str(th_value))
+            else:
+                print("Error: The datatype " + data_type + " is not supported by the database manager.")
+                return False
+        except:
+            print("Error: The value " + th_value + " for the where clause should be of type " + data_type + '.')
+            return False
+        
+
+        if operator.upper() == 'EQ':
             return line_value == th_value
-        elif operator == 'le':
+        elif operator.upper() == 'LE':
             return line_value <= th_value
-        elif operator == 'ge':
+        elif operator.upper() == 'GE':
             return line_value >= th_value
-        elif operator == 'lt':
+        elif operator.upper() == 'LT':
             return line_value < th_value
-        elif operator == 'gt':
+        elif operator.upper() == 'GT':
             return line_value > th_value
-        elif operator == 'ne':
+        elif operator.upper() == 'NE':
             return line_value != th_value
         else:
             print('Error: Invalid operator ' + operator + '. The accepted operators are: eq, le, ge, lt, gt, ne.')
@@ -85,7 +101,7 @@ class TableOps:
         try:
             if fname not in self.columns:
                 raise("The name " + fname + "is not a valid column name.")
-            if operator == 'or' or operator == '':
+            if operator.upper() == 'OR' or operator.upper() == '':
                 for line in self.lines:
                     if self.bool_op(
                         line[self.columns[fname]],
@@ -95,7 +111,7 @@ class TableOps:
                         if result is None:
                             result = []
                         result.append(line)
-            elif operator == 'and':
+            elif operator.upper() == 'AND':
                 if result is None and not first:
                     return result
                 if first:
@@ -135,15 +151,15 @@ class TableOps:
             )
             return
         for fname, fvalue in filters.items():
-            if fname != 'op_bool':
+            if fname.upper() != 'OP_BOOL':
                 result = self.apply_filter(
                     result, fname, fvalue, filters['op_bool'], first
                 )
             first = False
-        if operation == 'select':
+        if operation.upper() == 'SELECT':
             self.result = result
             return result
-        if operation == 'delete':
+        if operation.upper() == 'DELETE':
             for line in result:
                 line_no = self.is_line(line, self.lines)
                 if line_no > -1:
@@ -152,10 +168,19 @@ class TableOps:
     def is_valid(self, val, col):
         md = self.metadata[col]
         try:
-            _ = eval(md[0] + '(' + str(val) + ')')
-        except Exception:
+            if md[0].upper() == 'NUMERIC':
+                line_value = float(str(line_value))
+            elif md[0].upper() == 'TEXT':
+                line_value = str(line_value)
+            elif md[0].upper() == 'BOOLEAN':
+                line_value = bool(str(line_value))
+            else:
+                print("Error: The data type" + md[0] + " is not supported by the database manager.")
+                return False
+        except:
             print("Error: The value for the column " + col + " should be of type " + md[0] + '.')
             return False
+            
         if len(md) > 1 and int(md[1]) > 0:
             if len(val) > int(md[1]):
                 print("Error: The value for the column " + col + " sould have the length " + str(md[1]) + '.')
