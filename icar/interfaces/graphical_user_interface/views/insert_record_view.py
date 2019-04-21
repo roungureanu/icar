@@ -36,7 +36,7 @@ class InsertRecordView(base_view.BaseView):
 
             self.fields[column_name] = value_entry
 
-        create_button.grid(row=len(self.table_operations.columns) + 1, column=0)
+        create_button.grid(row=len(self.table_operations.columns) + 1, column=0, sticky=tk.W + tk.E)
 
         cancel_button = tk.Button(
             self,
@@ -45,7 +45,7 @@ class InsertRecordView(base_view.BaseView):
                 icar.interfaces.graphical_user_interface.views.main_view.MainPage(self.app)
             )
         )
-        cancel_button.grid(row=len(self.table_operations.columns) + 1, column=1)
+        cancel_button.grid(row=len(self.table_operations.columns) + 1, column=1, sticky=tk.W + tk.E)
 
     def insert_record_callback(self):
         values = [

@@ -13,6 +13,8 @@ import icar.interfaces.graphical_user_interface.views.delete_records_view as del
 import icar.interfaces.graphical_user_interface.views.update_records_view as update_records_view
 import icar.interfaces.graphical_user_interface.views.export_table_view as export_table_view
 import icar.interfaces.graphical_user_interface.views.import_table_view as import_table_view
+import icar.interfaces.graphical_user_interface.views.add_column_view as add_column_view
+import icar.interfaces.graphical_user_interface.views.remove_column_view as remove_column_view
 
 
 class _Menu(tk.Frame):
@@ -105,6 +107,8 @@ class _Menu(tk.Frame):
                         'Browse Records',
                         'Delete Records',
                         'Update Records',
+                        'Add Column',
+                        'Remove Column',
                         'Export',
                         'Import'
                     ]
@@ -121,6 +125,10 @@ class _Menu(tk.Frame):
             self.app.replace_frame(delete_records_view.DeleteRecordsView(self.app))
         elif option_picked == 'Update Records':
             self.app.replace_frame(update_records_view.UpdateRecordsView(self.app))
+        elif option_picked == 'Add Column':
+            self.app.replace_frame(add_column_view.AddColumnView(self.app))
+        elif option_picked == 'Remove Column':
+            self.app.replace_frame(remove_column_view.RemoveColumnView(self.app))
         elif option_picked == 'Export':
             self.app.replace_frame(export_table_view.ExportTableView(self.app))
         elif option_picked == 'Import':
@@ -159,7 +167,7 @@ class _CurrentOpenDatabase(tk.Frame):
         tk.Label(
             self,
             text=message
-        ).pack()
+        ).grid(row=0, column=0)
 
 
 class _CurrentOpenTable(tk.Frame):
@@ -178,14 +186,14 @@ class _CurrentOpenTable(tk.Frame):
         tk.Label(
             self,
             text=message
-        ).pack()
+        ).grid(row=0, column=0)
 
 
 class MainPage(base_view.BaseView):
     def create_widgets(self):
         self.winfo_toplevel().title('Databases Browser')
 
-        _Menu(self, self.app).grid(row=0, column=0)
-        _OperationResultMessage(self, self.app).grid(row=1, column=0)
-        _CurrentOpenDatabase(self, self.app).grid(row=2, column=0)
-        _CurrentOpenTable(self, self.app).grid(row=3, column=0)
+        _Menu(self, self.app).grid(row=0, column=0, sticky=tk.W + tk.E)
+        _OperationResultMessage(self, self.app).grid(row=1, column=0, sticky=tk.W)
+        _CurrentOpenDatabase(self, self.app).grid(row=2, column=0, sticky=tk.W + tk.E)
+        _CurrentOpenTable(self, self.app).grid(row=3, column=0, sticky=tk.W)

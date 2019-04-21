@@ -20,7 +20,7 @@ class CreateDatabasePage(base_view.BaseView):
             text='Create',
             command=self.create_database_callback
         )
-        create_button.grid(row=1, column=0)
+        create_button.grid(row=1, column=0, sticky=tk.W + tk.E)
 
         cancel_button = tk.Button(
             self,
@@ -29,7 +29,7 @@ class CreateDatabasePage(base_view.BaseView):
                 icar.interfaces.graphical_user_interface.views.main_view.MainPage(self.app)
             )
         )
-        cancel_button.grid(row=1, column=1)
+        cancel_button.grid(row=1, column=1, sticky=tk.W + tk.E)
 
     def create_database_callback(self):
         database_name = self.entry.get()

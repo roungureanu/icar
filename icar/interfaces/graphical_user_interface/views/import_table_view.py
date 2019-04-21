@@ -37,7 +37,7 @@ class ImportTableView(base_view.BaseView):
             self,
             text='Import',
             command=self.import_callback
-        ).grid(row=0, column=2)
+        ).grid(row=1, column=0, sticky=tk.W + tk.E)
 
         tk.Button(
             self,
@@ -45,7 +45,7 @@ class ImportTableView(base_view.BaseView):
             command=lambda: self.app.replace_frame(
                 icar.interfaces.graphical_user_interface.views.main_view.MainPage(self.app)
             )
-        ).grid(row=0, column=3)
+        ).grid(row=1, column=1, sticky=tk.W + tk.E)
 
     def import_callback(self):
         if self.import_path_string_variable:

@@ -278,7 +278,10 @@ def add_column(database_name, table_name, column_name, column_type, column_size)
         if i == 0:
             data[i] = '{},{}'.format(data[i], column_name)
         else:
-            data[i] = '{},NULL'.format(data[i])
+            if column_type == constants.VALID_COLUMN_TYPES['NUMERIC']:
+                data[i] = '{},0'.format(data[i])
+            else:
+                data[i] = '{},NULL'.format(data[i])
     data = '\n'.join(data)
     with open(filePath, 'w') as f:
         f.write(data)

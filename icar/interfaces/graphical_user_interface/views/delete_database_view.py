@@ -21,9 +21,9 @@ class DeleteDatabasePage(base_view.BaseView):
         create_button = tk.Button(
             self,
             text='DELETE',
-            command=self.delete_database_callback
+            command=self.delete_database_callback,
         )
-        create_button.grid(row=1, column=0)
+        create_button.grid(row=1, column=0, sticky=tk.E + tk.W)
 
         cancel_button = tk.Button(
             self,
@@ -32,7 +32,7 @@ class DeleteDatabasePage(base_view.BaseView):
                 icar.interfaces.graphical_user_interface.views.main_view.MainPage(self.app)
             )
         )
-        cancel_button.grid(row=1, column=1)
+        cancel_button.grid(row=1, column=1, sticky=tk.E + tk.W)
 
     def delete_database_callback(self):
         database_name = self.database_to_delete_variable.get()

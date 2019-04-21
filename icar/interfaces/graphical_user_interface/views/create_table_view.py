@@ -17,11 +17,11 @@ class CreateTableView(base_view.BaseView):
         tk.Label(
             self,
             text='Table Name'
-        ).grid(row=0, column=0)
+        ).grid(row=0, column=0, sticky=tk.E + tk.W)
         self.table_name_entry = tk.Entry(
             self
         )
-        self.table_name_entry.grid(row=0, column=1)
+        self.table_name_entry.grid(row=0, column=1, columnspan=2, sticky=tk.E + tk.W)
 
         self.create_menu()
 
@@ -31,14 +31,14 @@ class CreateTableView(base_view.BaseView):
             text='Create',
             command=self.create_table_callback
         )
-        create_button.grid(row=row, column=0)
+        create_button.grid(row=row, column=0, sticky=tk.E + tk.W)
 
         add_column_button = tk.Button(
             self,
             text='Add Column',
             command=self.add_column_callback
         )
-        add_column_button.grid(row=row, column=1)
+        add_column_button.grid(row=row, column=1, sticky=tk.E + tk.W)
 
         cancel_button = tk.Button(
             self,
@@ -47,7 +47,7 @@ class CreateTableView(base_view.BaseView):
                 icar.interfaces.graphical_user_interface.views.main_view.MainPage(self.app)
             )
         )
-        cancel_button.grid(row=row, column=2)
+        cancel_button.grid(row=row, column=2, sticky=tk.E + tk.W)
 
         self.menu_buttons.append(create_button)
         self.menu_buttons.append(add_column_button)
@@ -90,9 +90,9 @@ class CreateTableView(base_view.BaseView):
             }
         )
 
-        column_name_entry_field.grid(row=len(self.fields), column=0)
-        column_type_option_field.grid(row=len(self.fields), column=1)
-        delete_field_button.grid(row=len(self.fields), column=2)
+        column_name_entry_field.grid(row=len(self.fields), column=0, sticky=tk.E + tk.W)
+        column_type_option_field.grid(row=len(self.fields), column=1, sticky=tk.E + tk.W)
+        delete_field_button.grid(row=len(self.fields), column=2, sticky=tk.E + tk.W)
 
         self.create_menu(len(self.fields) + 1)
 

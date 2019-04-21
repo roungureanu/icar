@@ -19,7 +19,8 @@ class Application(tk.Frame):
         if self._current_frame:
             self._current_frame.destroy()
         self._current_frame = frame
-        self._current_frame.pack()
+        self._current_frame.configure()
+        self._current_frame.pack(fill=tk.BOTH, expand=1)
         self.operation_result_message = None
 
 
@@ -41,5 +42,6 @@ def retrieve_centered_root():
 
 
 root = retrieve_centered_root()
+
 app = Application(master=root)
 app.mainloop()
