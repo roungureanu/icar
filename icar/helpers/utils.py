@@ -1,7 +1,9 @@
 import os
+import sys
 import json
 import logging
 import logging.config
+import traceback
 
 import icar.helpers.constants as constants
 
@@ -20,6 +22,18 @@ def retrieve_logger(folder_name):
     logging.config.dictConfig(config)
 
     return logging.getLogger()
+
+
+def get_traceback(exc=None):
+    """
+    Return a traceback for the given or last exception.
+
+    :return: The traceback
+    :rtype: str
+    """
+    if exc is None:
+        exc = sys.exc_info()
+    return "".join(traceback.format_exception(*exc))
 
 
 if __name__ == '__main__':

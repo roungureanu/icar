@@ -1,8 +1,8 @@
 import os
 import operator
-from distutils.command.config import config
 
 import icar.core.xml_parser
+import icar.helpers.utils as utils
 import icar.helpers.constants as constants
 import icar.core.database_operations
 
@@ -103,7 +103,7 @@ class TableOps:
         value = fvalue['value']
         try:
             if fname not in self.columns:
-                raise("The name " + fname + "is not a valid column name.")
+                raise Exception("The name " + fname + " is not a valid column name.")
             if operator.upper() == 'OR' or operator.upper() == '':
                 for line in self.lines:
                     if self.bool_op(
@@ -393,7 +393,21 @@ class TableOps:
             for entry_node in entries_node.children
         ]
 
-        # TODO: call create table with metadata and entries here :(
+        entries_length = {len(entry) for entry in entries}
+        if len(entries_length) != 1:
+            raise Exception('There are entries with missing values..')
+
+        entry_length = list(entries_length)[0]
+
+        if len(table_metadata) != entry_length:
+            raise Exception('The number of values of the entries does not match the number of columns')
+
+        if len(set(column_names)) != len(column_names):
+            raise Exception('There are duplicate columns.')
+
+        if set(column_types).difference(icar.helpers.constants.VALID_COLUMN_TYPES.keys()):
+            raise Exception('Columns have invalid types.')
+
         icar.core.database_operations.delete_table(self.database_name, self.table_name)
         icar.core.database_operations.create_table(
             self.database_name,
@@ -409,13 +423,13 @@ class TableOps:
 
 if __name__ == "__main__":
     filters = {
-        'melci': {
+        'NAME': {
             'operator': 'eq',
-            'value': 1
+            'value': 'robert'
         },
         'op_bool': ''
     }
-    cols = ['*']
+    cols = ['NAME']
     # cols = ['scoici', 'raci']
     vals = [2, 4, 3, 6]
 
@@ -423,13 +437,17 @@ if __name__ == "__main__":
         constants.RESOURCES_FOLDER_PATH, 'export.xml'
     )
 
-    table_ops = TableOps('yet_another_test_db', 'my_table')
-    table_ops.export(export_path)
+    table_ops = TableOps('TEST', 'PERSON')
+    # table_ops.export(export_path)
     # table_ops.import_(export_path)
     # print(table_ops.lines)
     # print('')
     # print('select * where melci=1')
-    print(table_ops.select(filters, cols))
+    try:
+        res = table_ops.select(filters, cols)
+        print(res)
+    except Exception as exc:
+        print('!!!', utils.get_traceback(exc))
     # print('')
 
     # filters = {'scoici': {'operator': 'gt',

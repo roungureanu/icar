@@ -68,6 +68,11 @@ class BrowseRecordsView(base_view.BaseView):
 
             filters.grid(row=2, column=i + 1)
 
+        self.columns_to_select = tk.Listbox(self, selectmode='multiple')
+        for i, column_name in enumerate(self.table_operations.columns):
+            self.columns_to_select.insert(i + 1, column_name)
+        self.columns_to_select.grid(row=3, column=0)
+
     def filter_rows(self):
         operators_map = {
             '==': 'eq',
@@ -93,7 +98,12 @@ class BrowseRecordsView(base_view.BaseView):
                     'value': value
                 }
 
-        self.lines = self.table_operations.select(filters, ['*'])
+        columns = [self.columns_to_select.get(i) for i in self.columns_to_select.curselection()]
+        if not columns:
+            columns = ['*']
+        self.lines = self.table_operations.select(filters, columns)
+
+        print(self.lines)
 
         self.update_rows()
 
@@ -118,4 +128,4 @@ class BrowseRecordsView(base_view.BaseView):
                 tk.Entry(content_frame, textvariable=tk.StringVar(self, value)).grid(row=i, column=j)
 
         canvas.configure(yscrollcommand=scrollbar.set)
-        self.records.grid(row=3, columnspan=3)
+        self.records.grid(row=3, column=1, columnspan=2)

@@ -50,7 +50,11 @@ class ImportTableView(base_view.BaseView):
     def import_callback(self):
         if self.import_path_string_variable:
             path = self.import_path_string_variable.get()
-            self.table_operations.import_(path)
+            try:
+                self.table_operations.import_(path)
+                self.app.operation_result_message = 'Imported table successfully.'
+            except Exception as exc:
+                self.app.operation_result_message = 'Failed to import table because: {}'.format(exc)
 
         self.app.replace_frame(
             icar.interfaces.graphical_user_interface.views.main_view.MainPage(self.app)
