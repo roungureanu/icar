@@ -36,11 +36,20 @@ class AddColumnView(base_view.BaseView):
             self, self.new_column_type, *column_types
         ).grid(row=2, column=1, sticky=tk.W + tk.E)
 
+        tk.Label(
+            self,
+            text='Column Size'
+        ).grid(row=3, column=0, sticky=tk.W + tk.E)
+        self.new_column_size = tk.Entry(
+            self
+        )
+        self.new_column_size.grid(row=3, column=1)
+
         tk.Button(
             self,
             text='Create',
             command=self.add_column_callback
-        ).grid(row=3, column=0, sticky=tk.W + tk.E)
+        ).grid(row=4, column=0, sticky=tk.W + tk.E)
 
         tk.Button(
             self,
@@ -48,12 +57,19 @@ class AddColumnView(base_view.BaseView):
             command=lambda: self.app.replace_frame(
                 icar.interfaces.graphical_user_interface.views.main_view.MainPage(self.app)
             )
-        ).grid(row=3, column=1, sticky=tk.W + tk.E)
+        ).grid(row=4, column=1, sticky=tk.W + tk.E)
 
     def add_column_callback(self):
         column_name = self.new_column_entry.get()
         column_type = self.new_column_type.get()
-        column_size = 10
+
+        if column_type == icar.helpers.constants.VALID_COLUMN_TYPES['NUMERIC']:
+            column_size = 0
+        else:
+            try:
+                column_size = self.new_column_size.get()
+            except Exception:
+                column_size = 255
 
         if column_name:
             icar.core.database_operations.add_column(

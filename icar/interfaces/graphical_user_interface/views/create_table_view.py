@@ -23,9 +23,18 @@ class CreateTableView(base_view.BaseView):
         )
         self.table_name_entry.grid(row=0, column=1, columnspan=2, sticky=tk.E + tk.W)
 
-        self.create_menu()
+        column_name_label = tk.Label(self, text='Column Name')
+        column_type_label = tk.Label(self, text='Column Type')
+        column_size_label = tk.Label(self, text='Column Size')
 
-    def create_menu(self, row=1):
+        column_name_label.grid(row=1, column=0, sticky=tk.W + tk.E)
+        column_type_label.grid(row=1, column=1, sticky=tk.W + tk.E)
+        column_size_label.grid(row=1, column=2, sticky=tk.W + tk.E)
+
+        self.create_menu()
+        self.add_column_callback()
+
+    def create_menu(self, row=2):
         create_button = tk.Button(
             self,
             text='Create',
@@ -75,30 +84,46 @@ class CreateTableView(base_view.BaseView):
         delete_field_button = tk.Button(
             self,
             text='Delete',
-            command=lambda: self.delete_row(row)
         )
+
+        column_size_entry_field = tk.Entry(
+            self
+        )
+
         row.append(column_name_entry_field)
         row.append(column_type_option_field)
         row.append(delete_field_button)
+        row.append(column_size_entry_field)
 
-        self.fields.append(
-            {
-                'column_name_entry_field': column_name_entry_field,
-                'column_type_option_field': column_type_option_field,
-                'column_type_option_field_value': column_type_option_field_value,
-                'delete_field_button': delete_field_button
-            }
-        )
+        entry = {
+            'column_name_entry_field': column_name_entry_field,
+            'column_type_option_field': column_type_option_field,
+            'column_type_option_field_value': column_type_option_field_value,
+            'delete_field_button': delete_field_button,
+            'column_size_entry_field': column_size_entry_field
+        }
+        self.fields.append(entry)
+        delete_field_button.configure(command=lambda: self.delete_row(row, entry))
 
-        column_name_entry_field.grid(row=len(self.fields), column=0, sticky=tk.E + tk.W)
-        column_type_option_field.grid(row=len(self.fields), column=1, sticky=tk.E + tk.W)
-        delete_field_button.grid(row=len(self.fields), column=2, sticky=tk.E + tk.W)
+        column_name_entry_field.grid(row=len(self.fields) + 1, column=0, sticky=tk.E + tk.W)
+        column_type_option_field.grid(row=len(self.fields) + 1, column=1, sticky=tk.E + tk.W)
+        column_size_entry_field.grid(row=len(self.fields) + 1, column=2, sticky=tk.E + tk.W)
+        delete_field_button.grid(row=len(self.fields) + 1, column=3, sticky=tk.E + tk.W)
 
-        self.create_menu(len(self.fields) + 1)
+        self.create_menu(len(self.fields) + 2)
 
-    def delete_row(self, row):
+    def delete_row(self, row, entry):
+        print(len(self.fields))
+        if len(self.fields) == 1:
+            return
+
         for item in row:
             item.destroy()
+
+        for field in self.fields:
+            if field == entry:
+                self.fields.remove(field)
+                break
 
     def create_table_callback(self):
         table_name = self.table_name_entry.get()
@@ -110,7 +135,15 @@ class CreateTableView(base_view.BaseView):
         for field in self.fields:
             column_name = field['column_name_entry_field'].get()
             column_type = field['column_type_option_field_value'].get()
-            column_size = 10
+            column_size = field['column_size_entry_field'].get()
+
+            if column_type == icar.helpers.constants.VALID_COLUMN_TYPES['NUMERIC']:
+                column_size = 0
+            else:
+                try:
+                    column_size = int(column_size)
+                except Exception:
+                    column_size = 255
 
             if column_name:
                 column_names.append(column_name)
