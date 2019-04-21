@@ -6,7 +6,7 @@ import icar.interfaces.graphical_user_interface.views.main_view as main_view
 class Application(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
-        self.pack()
+        self.pack(fill=tk.BOTH)
 
         self._current_frame = None
         self.current_open_database = None
@@ -30,7 +30,7 @@ def retrieve_centered_root():
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
 
-    application_width = 1000
+    application_width = 600
     application_heigth = 400
 
     x_position = int(screen_width / 2 - application_width / 2)

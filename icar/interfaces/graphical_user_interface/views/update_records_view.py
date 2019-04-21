@@ -37,19 +37,19 @@ class UpdateRecordsView(base_view.BaseView):
             self,
             text='Update',
             command=self.update_records
-        ).grid(row=0, column=1)
+        ).grid(row=0, column=1, sticky=tk.N + tk.S + tk.E + tk.W)
         tk.Button(
             self,
             text='Go Back',
             command=lambda: self.app.replace_frame(
                 icar.interfaces.graphical_user_interface.views.main_view.MainPage(self.app)
             )
-        ).grid(row=0, column=2)
+        ).grid(row=0, column=2, sticky=tk.N + tk.S + tk.E + tk.W)
 
-        self.operator_value = tk.StringVar(self, '')
+        self.operator_value = tk.StringVar(self, 'AND')
         tk.OptionMenu(
             self, self.operator_value, *['AND', 'OR']
-        ).grid(row=2, column=0)
+        ).grid(row=2, column=0, sticky=tk.W + tk.E)
         for i, column_name in enumerate(self.table_operations.columns.keys()):
             tk.Label(self, text=column_name).grid(row=1, column=i + 1)
 
@@ -72,9 +72,13 @@ class UpdateRecordsView(base_view.BaseView):
 
         tk.Label(self, text='New Values').grid(row=4, column=0)
         for i, column_name in enumerate(self.table_operations.columns.keys()):
-            tk.Label(self, text=column_name).grid(row=3, column=i + 1)
+            tk.Label(
+                self, text=column_name
+            ).grid(row=3, column=i + 1, sticky=tk.W + tk.E)
             self.new_values[column_name] = tk.StringVar(self, '')
-            tk.Entry(self, textvariable=self.new_values[column_name]).grid(row=4, column=i + 1)
+            tk.Entry(
+                self, textvariable=self.new_values[column_name]
+            ).grid(row=4, column=i + 1, sticky=tk.W + tk.E, columnspan=2)
 
     def update_records(self):
         operators_map = {

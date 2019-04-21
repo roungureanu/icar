@@ -38,7 +38,7 @@ class _Menu(tk.Frame):
             text='Create Database',
             command=lambda: self.app.replace_frame(create_database_view.CreateDatabasePage(self.app))
         )
-        self.create_database.grid(row=0, column=0)
+        self.create_database.grid(row=0, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
 
         self.current_database_to_open = tk.StringVar(self, value='Open Database')
         self.current_database_to_open.trace(
@@ -49,14 +49,14 @@ class _Menu(tk.Frame):
         available_databases = icar.core.database_operations.list_databases()
         if available_databases:
             self.open_database = tk.OptionMenu(self, self.current_database_to_open, *available_databases)
-            self.open_database.grid(row=0, column=1)
+            self.open_database.grid(row=0, column=1, sticky=tk.N + tk.S + tk.E + tk.W)
 
             self.delete_database = tk.Button(
                 self,
                 text='Delete Database',
                 command=lambda: self.app.replace_frame(delete_database_view.DeleteDatabasePage(self.app))
             )
-            self.delete_database.grid(row=0, column=2)
+            self.delete_database.grid(row=0, column=2, sticky=tk.N + tk.S + tk.E + tk.W)
 
         if self.app.current_open_database:
             available_tables = icar.core.database_operations.list_tables(self.app.current_open_database)
@@ -67,16 +67,16 @@ class _Menu(tk.Frame):
                 self.update_current_open_table
             )
 
-            if available_tables:
-                self.open_table = tk.OptionMenu(self, self.current_table_to_open, *available_tables)
-                self.open_table.grid(row=0, column=3)
-
             self.create_table = tk.Button(
                 self,
                 text='Create Table',
                 command=lambda: self.app.replace_frame(create_table_view.CreateTableView(self.app))
             )
-            self.create_table.grid(row=0, column=4)
+            self.create_table.grid(row=1, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
+
+            if available_tables:
+                self.open_table = tk.OptionMenu(self, self.current_table_to_open, *available_tables)
+                self.open_table.grid(row=1, column=1, sticky=tk.N + tk.S + tk.E + tk.W)
 
             if available_tables:
                 self.delete_table = tk.Button(
@@ -84,7 +84,7 @@ class _Menu(tk.Frame):
                     text='Delete Table',
                     command=lambda: self.app.replace_frame(delete_table_view.DeleteTablePage(self.app))
                 )
-                self.delete_table.grid(row=0, column=5)
+                self.delete_table.grid(row=1, column=2, sticky=tk.N + tk.S + tk.E + tk.W)
 
                 # self.rename_table = tk.Button(
                 #     self,
@@ -113,7 +113,7 @@ class _Menu(tk.Frame):
                         'Import'
                     ]
                 )
-                self.table_operations_menu.grid(row=0, column=6)
+                self.table_operations_menu.grid(row=2, column=0, sticky=tk.N + tk.S + tk.E + tk.W, columnspan=3)
 
     def table_operation_menu_callback(self, *args):
         option_picked = self.table_operation_menu_variable.get()
