@@ -264,7 +264,7 @@ def add_column(database_name, table_name, column_name, column_type, column_size)
     column_type = column_type.upper()
     if column_type not in constants.VALID_COLUMN_TYPES:
         return (1, 'Error: Invalid type.')
-    if type(column_size != int):
+    if type(column_size) != int or column_size < 0:
         column_size = 0
     dirPath = os.path.join(constants.DATABASES_PATH, database_name)
     if not os.path.exists(dirPath):
