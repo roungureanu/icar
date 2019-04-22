@@ -155,6 +155,8 @@ class TableOps:
             return
         for fname, fvalue in filters.items():
             if fname.upper() != 'OP_BOOL':
+                if len(filters) == 1:
+                    filters['op_bool'] == ''
                 result = self.apply_filter(
                     result, fname, fvalue, filters['op_bool'], first
                 )
@@ -231,7 +233,10 @@ class TableOps:
     # @param cols = an array with the columns written after select in the statement
     # @return result = list of lists, the results of the select(the indicated lines and columns)
     def select(self, filters, cols):
-        self.where(filters, 'select')
+        if "NAME" in filters:
+            self.where(filters, 'select')
+        else:
+            self.result = self.lines
         self.filter_columns(cols)
         return self.result
         
@@ -427,7 +432,7 @@ if __name__ == "__main__":
             'operator': 'eq',
             'value': 'robert'
         },
-        'op_bool': ''
+        'op_bool': 'AND'
     }
     cols = ['NAME']
     # cols = ['scoici', 'raci']
