@@ -33,7 +33,7 @@ class TableOps:
             return False
         return True
         
-    def set_table(self, database, table, metadata):
+    def set_table(self, database, table, metadata=None):
         self.__init__(database, table)
 
     def preprocess(self):
@@ -233,7 +233,7 @@ class TableOps:
     # @param cols = an array with the columns written after select in the statement
     # @return result = list of lists, the results of the select(the indicated lines and columns)
     def select(self, filters, cols):
-        if "NAME" in filters:
+        if len(filters) >= 1:
             self.where(filters, 'select')
         else:
             self.result = self.lines
@@ -431,6 +431,10 @@ if __name__ == "__main__":
         'NAME': {
             'operator': 'eq',
             'value': 'robert'
+        },
+        'AGE': {
+            'operator': 'eq',
+            'value': '200'
         },
         'op_bool': 'AND'
     }
