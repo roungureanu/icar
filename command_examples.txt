@@ -1,0 +1,17 @@
+create database friends
+create table dogs in friends (name text 20, age numeric 10, smart boolean)
+create table pisici in friends (colour text 20, breed text 15, annoying numeric 10)
+rename table pisici into dusmani in friends
+delete table pisici in friends
+delete table dusmani in friends
+alter table dogs in friends drop column smart
+alter table dogs in friends add column size numeric 30
+alter table dogs in friends rename column size to weight
+update dogs set name = toto where name eq tototo
+
+insert into dogs (name, age, weight, colour) values (toto, 12, 10, white)
+select name, weight, colour from dogs where name eq toto and age lt 15
+
+export dogs in friends at path D:\Amazing Stuff\Facultate\CSS\icar2\icar\resources\myexport.xml
+import generic_dogs in friends at path D:\Amazing Stuff\Facultate\CSS\icar2\icar\resources\myimport.xml
+! For the import, the files must exist in the database *TABLE_NAME*.csv and *TABLE_NAME*.metadata
