@@ -155,12 +155,12 @@ class TableOps:
             return
         for fname, fvalue in filters.items():
             if fname.upper() != 'OP_BOOL':
-                if len(filters) == 1:
-                    filters['op_bool'] == ''
+                if len(filters) == 2:
+                    filters['op_bool'] = ''
                 result = self.apply_filter(
                     result, fname, fvalue, filters['op_bool'], first
                 )
-            first = False
+                first = False
         if operation.upper() == 'SELECT':
             self.result = result
             return result

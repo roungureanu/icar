@@ -88,8 +88,8 @@ class BrowseRecordsView(base_view.BaseView):
             columns = ['*']
 
         # TODO: Remove when this gets fixed :(
-        if filters['op_bool'] == 'AND':
-            filters['op_bool'] = ''
+        # if filters['op_bool'] == 'AND':
+        #     filters['op_bool'] = ''
 
         self.lines = self.table_operations.select(filters, columns)
 
