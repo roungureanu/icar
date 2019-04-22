@@ -235,6 +235,30 @@ class Application(object):
 
             return ret
 
+        # EXPORT *TABLE_NAME* IN *DATABASE_NAME* AT PATH *EXPORT_FILE_PATH*.xml
+        if command.startswith('export'):
+            m = re.search("export (?P<t_name>.*) in (?P<d_name>.*) at path (?P<path>.*)", command)
+            database_name = m.group('d_name')
+            table_name = m.group('t_name')
+            path = m.group('path')
+
+            ops = table_operations.TableOps(database_name, table_name)
+            result = ops.export(path)
+
+            return "Export done at path {}".format(path)
+
+        # IMPORT *TABLE_NAME* IN *DATABASE_NAME* AT PATH *IMPORT_FILE_PATH*.xml
+        if command.startswith('import'):
+            m = re.search("import (?P<t_name>.*) in (?P<d_name>.*) at path (?P<path>.*)", command)
+            database_name = m.group('d_name')
+            table_name = m.group('t_name')
+            path = m.group('path')
+
+            ops = table_operations.TableOps(database_name, table_name)
+            result = ops.import_(path)
+
+            return "Imported table at path {}".format(path)
+
     def should_stop(self):
         return self.stop_required
 
