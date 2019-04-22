@@ -233,7 +233,7 @@ class TableOps:
     # @param cols = an array with the columns written after select in the statement
     # @return result = list of lists, the results of the select(the indicated lines and columns)
     def select(self, filters, cols):
-        if len(filters) >= 1:
+        if len(filters) > 1:
             self.where(filters, 'select')
         else:
             self.result = self.lines
