@@ -41,7 +41,8 @@ def retrieve_centered_root():
     return root
 
 
-root = retrieve_centered_root()
+if __name__ == '__main__':
+    root = retrieve_centered_root()
 
-app = Application(master=root)
-app.mainloop()
+    app = Application(master=root)
+    app.mainloop()

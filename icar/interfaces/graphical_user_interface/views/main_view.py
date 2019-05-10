@@ -3,7 +3,7 @@ import tkinter.ttk as ttk
 
 import icar.core.database_operations
 import icar.interfaces.graphical_user_interface.core.base_view as base_view
-import icar.interfaces.graphical_user_interface.views.create_database_view as create_database_view
+import icar.interfaces.graphical_user_interface.views.create_database_view
 import icar.interfaces.graphical_user_interface.views.delete_database_view as delete_database_view
 import icar.interfaces.graphical_user_interface.views.create_table_view as create_table_view
 import icar.interfaces.graphical_user_interface.views.delete_table_view as delete_table_view
@@ -36,7 +36,9 @@ class _Menu(tk.Frame):
         self.create_database = tk.Button(
             self,
             text='Create Database',
-            command=lambda: self.app.replace_frame(create_database_view.CreateDatabasePage(self.app))
+            command=lambda: self.app.replace_frame(
+                icar.interfaces.graphical_user_interface.views.create_database_view.CreateDatabasePage(self.app)
+            )
         )
         self.create_database.grid(row=0, column=0, sticky=tk.N + tk.S + tk.E + tk.W)
 
