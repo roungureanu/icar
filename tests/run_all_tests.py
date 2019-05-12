@@ -18,6 +18,10 @@ import graphical_user_interface.update_records_view
 import test_table_ops
 import test_xml_parser
 
+from database_operations import create_database, delete_database, \
+    create_table, delete_table, database_exists, list_databases, \
+    list_tables, rename_table, add_column, rename_column, remove_column
+
 
 if __name__ == '__main__':
     tests_to_run = [
@@ -36,7 +40,18 @@ if __name__ == '__main__':
         graphical_user_interface.insert_record_view.TestCase,
         graphical_user_interface.main_view.TestCase,
         graphical_user_interface.remove_column_view.TestCase,
-        graphical_user_interface.update_records_view.TestCase
+        graphical_user_interface.update_records_view.TestCase,
+        create_database.FunctionTest,
+        delete_database.FunctionTest,
+        create_table.FunctionTest,
+        delete_table.FunctionTest,
+        database_exists.FunctionTest,
+        list_databases.FunctionTest,
+        list_tables.FunctionTest,
+        rename_table.FunctionTest,
+        add_column.FunctionTest,
+        rename_column.FunctionTest,
+        remove_column.FunctionTest
     ]
 
     tests_loader = unittest.TestLoader()
