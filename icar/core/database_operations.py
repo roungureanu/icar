@@ -9,7 +9,9 @@ import icar.helpers.constants as constants
 
 # CREATE DATABASE *DATABASE_NAME*
 def create_database(database_name):
-    if type(database_name) != str and database_name.isalnum():
+    if type(database_name) != str:
+        return (1, 'Error: Invalid database name.')
+    if not database_name.isalnum():
         return (1, 'Error: Invalid database name.')
     database_name = database_name.upper()
     dirPath = os.path.join(constants.DATABASES_PATH, database_name)
@@ -23,6 +25,10 @@ def create_database(database_name):
 
 
 def database_exists(database_name):
+    if type(database_name) != str:
+        return (1, 'Error: Invalid database name.')
+    if not database_name.isalnum():
+        return (1, 'Error: Invalid database name.')
     return database_name.upper() in os.listdir(constants.DATABASES_PATH)
 
 
@@ -44,7 +50,9 @@ def list_tables(database_name):
 
 # DELETE DATABASE *DATABASE_NAME*
 def delete_database(database_name):
-    if type(database_name) != str and database_name.isalnum():
+    if type(database_name) != str:
+        return (1, 'Error: Invalid database name.')
+    if not database_name.isalnum():
         return (1, 'Error: Invalid database name.')
     database_name = database_name.upper()
     dirPath = os.path.join(constants.DATABASES_PATH, database_name)
@@ -69,9 +77,13 @@ def delete_database(database_name):
 
 # CREATE TABLE *TABLE_NAME* (IN *DATABASE_NAME* ?) (*COLUMN_NAME_1* *COLUMN_TYPE_1*, ...)
 def create_table(database_name, table_name, columns, types, sizes):
-    if type(database_name) != str and database_name.isalnum():
+    if type(database_name) != str:
         return (1, 'Error: Invalid database name.')
-    if type(table_name) != str and table_name.isalnum():
+    if not database_name.isalnum():
+        return (1, 'Error: Invalid database name.')
+    if type(table_name) != str:
+        return (1, 'Error: Invalid table name.')
+    if not table_name.isalnum():
         return (1, 'Error: Invalid table name.')
     database_name = database_name.upper()
     table_name = table_name.upper()
@@ -107,9 +119,13 @@ def create_table(database_name, table_name, columns, types, sizes):
 
 # DELETE TABLE *TABLE_NAME* (IN *DATABASE_NAME* ?)
 def delete_table(database_name, table_name):
-    if type(database_name) != str and database_name.isalnum():
+    if type(database_name) != str:
         return (1, 'Error: Invalid database name.')
-    if type(table_name) != str and table_name.isalnum():
+    if not database_name.isalnum():
+        return (1, 'Error: Invalid database name.')
+    if type(table_name) != str:
+        return (1, 'Error: Invalid table name.')
+    if not table_name.isalnum():
         return (1, 'Error: Invalid table name.')
     database_name = database_name.upper()
     table_name = table_name.upper()
@@ -130,11 +146,17 @@ def delete_table(database_name, table_name):
 
 # RENAME TABLE *OLD_TABLE_NAME* INTO *NEW_TABLE_NAME* (IN *DATABASE_NAME* ?)
 def rename_table(database_name, old_table_name, new_table_name):
-    if type(database_name) != str and database_name.isalnum():
+    if type(database_name) != str:
         return (1, 'Error: Invalid database name.')
-    if type(old_table_name) != str and old_table_name.isalnum():
+    if not database_name.isalnum():
+        return (1, 'Error: Invalid database name.')
+    if type(old_table_name) != str:
         return (1, 'Error: Invalid old table name.')
-    if type(new_table_name) != str and new_table_name.isalnum():
+    if not old_table_name.isalnum():
+        return (1, 'Error: Invalid old table name.')
+    if type(new_table_name) != str:
+        return (1, 'Error: Invalid new table name.')
+    if not new_table_name.isalnum():
         return (1, 'Error: Invalid new table name.')
     database_name = database_name.upper()
     old_table_name = old_table_name.upper()
@@ -159,11 +181,17 @@ def rename_table(database_name, old_table_name, new_table_name):
 
 
 def remove_column(database_name, table_name, column_name):
-    if type(database_name) != str and database_name.isalnum():
+    if type(database_name) != str:
         return (1, 'Error: Invalid database name.')
-    if type(table_name) != str and table_name.isalnum():
+    if not database_name.isalnum():
+        return (1, 'Error: Invalid database name.')
+    if type(table_name) != str:
         return (1, 'Error: Invalid table name.')
-    if type(column_name) != str and column_name.isalnum():
+    if not table_name.isalnum():
+        return (1, 'Error: Invalid table name.')
+    if type(column_name) != str:
+        return (1, 'Error: Invalid column name.')
+    if not column_name.isalnum():
         return (1, 'Error: Invalid column name.')
     database_name = database_name.upper()
     table_name = table_name.upper()
@@ -204,13 +232,21 @@ def remove_column(database_name, table_name, column_name):
 
 
 def rename_column(database_name, table_name, old_column_name, new_column_name):
-    if type(database_name) != str and database_name.isalnum():
+    if type(database_name) != str:
         return (1, 'Error: Invalid database name.')
-    if type(table_name) != str and table_name.isalnum():
+    if not database_name.isalnum():
+        return (1, 'Error: Invalid database name.')
+    if type(table_name) != str:
         return (1, 'Error: Invalid table name.')
-    if type(old_column_name) != str and old_column_name.isalnum():
+    if not table_name.isalnum():
+        return (1, 'Error: Invalid table name.')
+    if type(old_column_name) != str:
         return (1, 'Error: Invalid old column name.')
-    if type(new_column_name) != str and new_column_name.isalnum():
+    if not old_column_name.isalnum():
+        return (1, 'Error: Invalid old column name.')
+    if type(new_column_name) != str:
+        return (1, 'Error: Invalid new column name.')
+    if not new_column_name.isalnum():
         return (1, 'Error: Invalid new column name.')
     database_name = database_name.upper()
     table_name = table_name.upper()
@@ -228,6 +264,8 @@ def rename_column(database_name, table_name, old_column_name, new_column_name):
     columns = header.split(',')
     if old_column_name not in columns:
         return (1, 'Error: Column doesn\'t exist.')
+    if new_column_name in columns:
+        return (1, 'Error: Column already exists.')
     index = columns.index(old_column_name)
     columns[index] = new_column_name
     header = ','.join(columns)
@@ -252,11 +290,17 @@ def rename_column(database_name, table_name, old_column_name, new_column_name):
 
 
 def add_column(database_name, table_name, column_name, column_type, column_size):
-    if type(database_name) != str and database_name.isalnum():
+    if type(database_name) != str:
         return (1, 'Error: Invalid database name.')
-    if type(table_name) != str and table_name.isalnum():
+    if not database_name.isalnum():
+        return (1, 'Error: Invalid database name.')
+    if type(table_name) != str:
         return (1, 'Error: Invalid table name.')
-    if type(column_name) != str and column_name.isalnum():
+    if not table_name.isalnum():
+        return (1, 'Error: Invalid table name.')
+    if type(column_name) != str:
+        return (1, 'Error: Invalid column name.')
+    if not column_name.isalnum():
         return (1, 'Error: Invalid column name.')
     database_name = database_name.upper()
     table_name = table_name.upper()
@@ -274,6 +318,10 @@ def add_column(database_name, table_name, column_name, column_type, column_size)
         return (1, 'Error: Table doesn\'t exist.')
     with open(filePath, 'r') as f:
         data = f.read().splitlines()
+    header = data[0]
+    columns = header.split(',')
+    if column_name in columns:
+        return (1, 'Error: Column already exists.')
     for i in range(len(data)):
         if i == 0:
             data[i] = '{},{}'.format(data[i], column_name)
