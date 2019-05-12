@@ -93,7 +93,7 @@ class BrowseRecordsView(base_view.BaseView):
 
         self.lines = self.table_operations.select(filters, columns)
 
-        print(self.lines)
+        # print(self.lines)
 
         self.update_rows()
 

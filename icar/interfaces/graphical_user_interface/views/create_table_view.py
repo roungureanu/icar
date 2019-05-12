@@ -113,7 +113,6 @@ class CreateTableView(base_view.BaseView):
         self.create_menu(len(self.fields) + 2)
 
     def delete_row(self, row, entry):
-        print(len(self.fields))
         if len(self.fields) == 1:
             return
 
