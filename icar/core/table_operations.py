@@ -3,7 +3,6 @@ import operator
 import sys
 sys.path.append('C:\\uni\\CSS\\icar')
 import icar.core.xml_parser
-import icar.helpers.utils as utils
 import icar.helpers.constants as constants
 import icar.core.database_operations
 

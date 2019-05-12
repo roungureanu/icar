@@ -1,6 +1,7 @@
 import os
 import icar.helpers.constants as constants
 
+
 class Node(object):
     def __init__(self, element, children):
         self.element = element
