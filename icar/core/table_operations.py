@@ -1,6 +1,7 @@
 import os
 import operator
-
+import sys
+sys.path.append('C:\\uni\\CSS\\icar')
 import icar.core.xml_parser
 import icar.helpers.utils as utils
 import icar.helpers.constants as constants
@@ -9,6 +10,7 @@ import icar.core.database_operations
 
 class TableOps:
     def __init__(self, database_name, table_name):
+        self.result = None
         self.database_name = database_name
         self.table_name = table_name
 
@@ -18,8 +20,8 @@ class TableOps:
 
         if self.check_db_params():
             self.preprocess()
-        else:
-            exit()
+        # else:
+            # exit()
         
     def check_db_params(self):
         if not os.path.isdir(self.database_file_path):
@@ -97,7 +99,7 @@ class TableOps:
             return line_value != th_value
         else:
             print('Error: Invalid operator ' + operator + '. The accepted operators are: eq, le, ge, lt, gt, ne.')
-            exit()
+            return False
                 
     def apply_filter(self, result, fname, fvalue, operator, first):
         value = fvalue['value']
@@ -245,7 +247,7 @@ class TableOps:
     # @return lines = list of lists, the data of the table after the indicated lines were deleted
     def delete(self, filters):
         self.where(filters, 'delete')
-        self.commit()
+        # self.commit()
         return self.lines
         
     # performs an insert operation
@@ -255,7 +257,7 @@ class TableOps:
     def insert(self, cols, vals):
         if cols[0] == '*':
             self.lines.append(vals)
-            self.commit()
+            # self.commit()
             return self.lines
         new_line = [None for _ in range(len(self.columns))]
         for val, col in zip(vals, cols):
@@ -265,7 +267,7 @@ class TableOps:
                 print(val, col)
                 return None
         self.lines.append(new_line)
-        self.commit()
+        # self.commit()
         return self.lines
         
     # performs a select operation
@@ -275,7 +277,7 @@ class TableOps:
     def update(self, filters, cols, vals):
         self.where(filters, 'select')
         self.filter_columns(cols, vals)
-        self.commit()
+        # self.commit()
         return self.lines
         
     # writes the data in memory to the table(overwrites it)
@@ -425,60 +427,3 @@ class TableOps:
         for entry in entries:
             self.insert(['*'], entry)
 
-
-if __name__ == "__main__":
-    filters = {
-        'NAME': {
-            'operator': 'eq',
-            'value': 'robert'
-        },
-        'AGE': {
-            'operator': 'eq',
-            'value': '200'
-        },
-        'op_bool': 'AND'
-    }
-    cols = ['NAME']
-    # cols = ['scoici', 'raci']
-    vals = [2, 4, 3, 6]
-
-    export_path = os.path.join(
-        constants.RESOURCES_FOLDER_PATH, 'export.xml'
-    )
-
-    table_ops = TableOps('TEST', 'PERSON')
-    # table_ops.export(export_path)
-    # table_ops.import_(export_path)
-    # print(table_ops.lines)
-    # print('')
-    # print('select * where melci=1')
-    try:
-        res = table_ops.select(filters, cols)
-        print(res)
-    except Exception as exc:
-        print('!!!', utils.get_traceback(exc))
-    # print('')
-
-    # filters = {'scoici': {'operator': 'gt',
-    #                          'value': 5},
-    #                'op_bool': ''}
-    # print(table_ops.lines)
-    # print('')
-    # print('delete where scoici>5')
-    # print(table_ops.delete(filters))
-    # print('')
-    #
-    # print(table_ops.lines)
-    # print('')
-    # print('insert (2, 4, 3, 6)')
-    # print(table_ops.insert(cols, vals))
-    # print('')
-
-    # filters = {'melci': {'operator': 'eq',
-    #                          'value': 1},
-    #                'op_bool': ''}
-    # print(table_ops.lines)
-    # print('')
-    # print('update * where melci=1 newvalues (2, 4, 3, 6)')
-    # print(table_ops.update(filters, cols, vals))
-    # print('')
