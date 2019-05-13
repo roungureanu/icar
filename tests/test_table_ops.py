@@ -51,12 +51,12 @@ class TestTableOps(unittest.TestCase):
     def test_set_table2(self):
         table_ops = TableOps('Friends', 'Dogs')
         table_ops.set_table("PEOPE", "persona")
-        self.assertEqual(table_ops.table_name, "person")
+        self.assertEqual(table_ops.table_name, "Dogs")
         
     def test_set_table3(self):
         table_ops = TableOps('Friends', 'Dogs')
         table_ops.set_table("PEOPE", "persona")
-        self.assertEqual(table_ops.database_name, "PEOPLE")
+        self.assertEqual(table_ops.database_name, "Friends")
         
     def test_preprocess0(self):
         table_ops = TableOps('Friends', 'Dogs')
