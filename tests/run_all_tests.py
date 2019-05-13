@@ -17,6 +17,7 @@ import graphical_user_interface.update_records_view
 
 import test_table_ops
 import test_xml_parser
+import test_cmd_interface
 
 from database_operations import create_database, delete_database, \
     create_table, delete_table, database_exists, list_databases, \
@@ -51,7 +52,8 @@ if __name__ == '__main__':
         rename_table.FunctionTest,
         add_column.FunctionTest,
         rename_column.FunctionTest,
-        remove_column.FunctionTest
+        remove_column.FunctionTest,
+        test_cmd_interface.CmdTest
     ]
 
     tests_loader = unittest.TestLoader()
