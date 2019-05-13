@@ -53,7 +53,16 @@ class TestCase(unittest.TestCase):
             self.assertIsNotNone(option_menu)
 
     def test_update_rows(self):
-        return
+        app = tk.Frame()
+        app.current_open_database = 'a'
+        app.current_open_table = 'a'
+
+        with unittest.mock.patch('icar.core.table_operations.TableOps') as table_ops:
+            table_ops().lines = ['a', 'b', 'c']
+            table_ops().columns = {'a': [], 'b': [], 'c': []}
+
+            view = browse_records_view.BrowseRecordsView(app)
+            self.assertNotEqual(len(view.records.pack_slaves()), 0)
 
     def test_filter_rows(self):
         icar.interfaces.graphical_user_interface.core.base_view.BaseView.__init__ = test_constructor

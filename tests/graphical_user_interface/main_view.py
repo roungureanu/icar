@@ -18,6 +18,9 @@ def test_constructor(self, app):
 
 
 class TestCase(unittest.TestCase):
+    def tearDown(self) -> None:
+        icar.interfaces.graphical_user_interface.core.base_view.BaseView.__init__ = normal_constructor
+
     def test_operation_result_message_create_widgets(self):
         app = tk.Frame()
         app.operation_result_message = 'a'
@@ -155,6 +158,66 @@ class TestCase(unittest.TestCase):
         found_frames = set(map(type, view.grid_slaves()))
 
         self.assertEqual(found_frames, frames)
+
+    def test_operation_menu_callback(self):
+        with unittest.mock.patch('icar.interfaces.graphical_user_interface.views.main_view._Menu.create_widgets'), \
+                unittest.mock.patch('icar.interfaces.graphical_user_interface.views.'
+                                    'insert_record_view.InsertRecordView'):
+            app = tk.Frame()
+            app.current_open_database = 'a'
+            app.current_open_table = 'a'
+            app.replace_frame = unittest.mock.Mock()
+
+            view = main_view._Menu(app, app)
+            view.table_operation_menu_variable = unittest.mock.Mock()
+            view.table_operation_menu_variable.get = unittest.mock.Mock(return_value='Insert Record')
+
+            view.table_operation_menu_callback()
+            app.replace_frame.assert_called()
+
+    def test_operation_menu_callback_invalid(self):
+        with unittest.mock.patch('icar.interfaces.graphical_user_interface.views.main_view._Menu.create_widgets'):
+            app = tk.Frame()
+            app.current_open_database = 'a'
+            app.current_open_table = 'a'
+            app.replace_frame = unittest.mock.Mock()
+
+            view = main_view._Menu(app, app)
+            view.table_operation_menu_variable = unittest.mock.Mock()
+            view.table_operation_menu_variable.get = unittest.mock.Mock(return_value='a')
+
+            view.table_operation_menu_callback()
+            app.replace_frame.assert_not_called()
+
+    def test_update_current_open_database(self):
+        with unittest.mock.patch('icar.interfaces.graphical_user_interface.views.main_view._Menu.create_widgets'), \
+                unittest.mock.patch('icar.interfaces.graphical_user_interface.views.main_view.MainPage'):
+            app = tk.Frame()
+            app.current_open_database = 'a'
+            app.current_open_table = 'a'
+            app.replace_frame = unittest.mock.Mock()
+
+            view = main_view._Menu(app, app)
+            view.current_database_to_open = unittest.mock.Mock()
+            view.current_database_to_open.get = unittest.mock.Mock(return_value='a')
+
+            view.update_current_open_database()
+            app.replace_frame.assert_called()
+
+    def test_update_current_open_table(self):
+        with unittest.mock.patch('icar.interfaces.graphical_user_interface.views.main_view._Menu.create_widgets'), \
+                unittest.mock.patch('icar.interfaces.graphical_user_interface.views.main_view.MainPage'):
+            app = tk.Frame()
+            app.current_open_database = 'a'
+            app.current_open_table = 'a'
+            app.replace_frame = unittest.mock.Mock()
+
+            view = main_view._Menu(app, app)
+            view.current_table_to_open = unittest.mock.Mock()
+            view.current_table_to_open.get = unittest.mock.Mock(return_value='a')
+
+            view.update_current_open_table()
+            app.replace_frame.assert_called()
 
 
 if __name__ == '__main__':
