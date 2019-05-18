@@ -10,6 +10,9 @@ import icar.core.database_operations
 class TableOps:
     def __init__(self, database_name, table_name):
         self.result = None
+        assert isinstance(database_name, str), "Database name should be of type string"
+        assert isinstance(table_name, str), "Table name should be of type string"
+        
         self.database_name = database_name
         self.table_name = table_name
 
@@ -17,8 +20,11 @@ class TableOps:
         self.table_file_path = os.path.join(self.database_file_path, '{}.csv'.format(table_name))
         self.table_metadata_file_path = os.path.join(self.database_file_path, '{}.metadata'.format(table_name))
 
-        if self.check_db_params():
-            self.preprocess()
+        assert os.path.isdir(self.database_file_path), "Database not found"
+        assert os.path.isfile(self.table_file_path), "Table not found"
+        assert os.path.isfile(self.table_metadata_file_path), "Metadata file not found"
+        # if self.check_db_params():
+        self.preprocess()
         # else:
             # exit()
         
@@ -57,12 +63,9 @@ class TableOps:
         for line_no, line in enumerate(open(self.table_metadata_file_path, 'rt').readlines()):
             values = line.strip().split(',')
             self.metadata[values[0]] = values[1:]
-        if len(self.columns) != len(self.metadata):
-            print("Error: The metadata file is not consistent with the table file.")
-            return
+        assert len(self.columns) == len(self.metadata), "Error: The metadata file is not consistent with the table file."
         for name in self.metadata:
-            if name not in self.columns:
-                print("Error: The metadata file is not consistent with the table file.")
+            assert name in self.columns, "The metadata file is not consistent with the table file."
 
     def bool_op(self, line_value, th_value, operator, data_type):
         # check for invalid operator or datatype
@@ -101,6 +104,12 @@ class TableOps:
             return False
                 
     def apply_filter(self, result, fname, fvalue, operator, first):
+        assert isinstance(fname, str), "fname should be of type string"
+        assert isinstance(fvalue, dict), "fvalue should be of type dict"
+        assert isinstance(first, bool), "first should be of type bool"
+        assert isinstance(operator, str), "operator should be of type str"
+        assert 'value' in fvalue, "the dictionary fvalue should contain a key named 'value'"
+        assert 'operator' in fvalue, "the dictionary fvalue should contain a key named 'operator'"
         value = fvalue['value']
         try:
             if fname not in self.columns:
@@ -146,14 +155,16 @@ class TableOps:
         return result
    
     def where(self, filters, operation):
+        assert 'op_bool' in filters, "The operator op_bool is missing from the filters dictionary."
+        assert isinstance(operation, str), "The operation argument should be of type str"
         result = []
         first = True
-        if 'op_bool' not in filters:
-            print(
-                'Error: The operator op_bool is missing from the filters dictionary. '
-                'If there is just one operation, make it an empty string.'
-            )
-            return
+        # if 'op_bool' not in filters:
+            # print(
+                # 'Error: The operator op_bool is missing from the filters dictionary. '
+                # 'If there is just one operation, make it an empty string.'
+            # )
+            # return
         for fname, fvalue in filters.items():
             if fname.upper() != 'OP_BOOL':
                 if len(filters) == 2:
@@ -168,10 +179,13 @@ class TableOps:
         if operation.upper() == 'DELETE':
             for line in result:
                 line_no = self.is_line(line, self.lines)
+                no_lines_old = len(self.lines)
                 if line_no > -1:
                     del self.lines[line_no]
+                assert no_lines_old == len(self.lilnes) + 1, "The deletion was unsuccessful"
         
     def is_valid(self, val, col):
+        assert col in self.metadata, "The indicated column name is not a valid one"
         md = self.metadata[col]
         try:
             if md[0].upper() == 'NUMERIC':
@@ -194,6 +208,8 @@ class TableOps:
         return True
                     
     def is_line(self, line, matrix):
+        assert isinstance(line, list), "Line should be of type list"
+        assert isinstance(matrix, list), "Matrix should be of type list"
         index = -1
         if len(matrix[0]) != len(line):
             return index
@@ -208,6 +224,7 @@ class TableOps:
         return -1
         
     def filter_columns(self, cols, vals=None):
+        assert isinstance(cols, list) or isinstance(cols, str), "The cols param should be of type list or str"
         if self.result is None:
             return None
         if len(cols) == 1 and cols[0] == '*' and vals is None:
@@ -226,7 +243,8 @@ class TableOps:
                             self.lines[line_no][self.columns[col]] = val
                         else:
                             return None
-        self.result = new_result    
+        self.result = new_result 
+        assert len(new_result) > 0, "The function returns an empty list"
         return new_result
     
     # performs a select operation
@@ -265,7 +283,9 @@ class TableOps:
             else:
                 print(val, col)
                 return None
+        old_lines = self.lines
         self.lines.append(new_line)
+        assert len(self.lines) == len(old_lines) + 1, "the line was not inserted successfuly"
         # self.commit()
         return self.lines
         
