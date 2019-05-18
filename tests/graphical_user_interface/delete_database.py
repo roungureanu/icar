@@ -45,6 +45,7 @@ class TestCase(unittest.TestCase):
         icar.interfaces.graphical_user_interface.core.base_view.BaseView.__init__ = test_constructor
 
         app = unittest.mock.Mock(icar.interfaces.graphical_user_interface_application.Application)
+        app.replace_frame = unittest.mock.Mock()
         app.current_open_database = 'b'
         view = delete_database_view.DeleteDatabasePage(app)
         view.database_to_delete_variable = unittest.mock.Mock(spec=['get'])
@@ -61,6 +62,7 @@ class TestCase(unittest.TestCase):
         icar.interfaces.graphical_user_interface.core.base_view.BaseView.__init__ = test_constructor
 
         app = unittest.mock.Mock(icar.interfaces.graphical_user_interface_application.Application)
+        app.replace_frame = unittest.mock.Mock()
         app.current_open_database = 'a'
         view = delete_database_view.DeleteDatabasePage(app)
         view.database_to_delete_variable = unittest.mock.Mock(spec=['get'])

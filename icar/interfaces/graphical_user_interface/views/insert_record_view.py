@@ -53,6 +53,8 @@ class InsertRecordView(base_view.BaseView):
             for entry_field in self.fields.values()
         ]
 
+        assert all(map(lambda item: isinstance(item, str), values))
+
         if len(values) == len(self.table_operations.columns):
             self.table_operations.insert(
                 list(self.table_operations.columns.keys()),

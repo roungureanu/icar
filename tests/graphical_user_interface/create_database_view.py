@@ -46,6 +46,7 @@ class TestCase(unittest.TestCase):
         icar.interfaces.graphical_user_interface.core.base_view.BaseView.__init__ = test_constructor
 
         app = unittest.mock.Mock(icar.interfaces.graphical_user_interface_application.Application)
+        app.replace_frame = unittest.mock.Mock()
         view = create_database_view.CreateDatabasePage(app)
         view.entry = unittest.mock.Mock(spec=['get'])
         view.entry.get = unittest.mock.Mock(return_value='a')

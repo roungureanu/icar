@@ -48,6 +48,8 @@ class ImportTableView(base_view.BaseView):
         ).grid(row=1, column=1, sticky=tk.W + tk.E)
 
     def import_callback(self):
+        assert isinstance(self.import_path_string_variable.get(), str)
+
         if self.import_path_string_variable:
             path = self.import_path_string_variable.get()
             try:
@@ -62,4 +64,5 @@ class ImportTableView(base_view.BaseView):
 
     def choose_directory_callback(self):
         path = tkinter.filedialog.askopenfilename(parent=self, initialdir=os.getcwd(), title='Select a file to import')
+        assert isinstance(path, str)
         self.import_path_string_variable.set(path)

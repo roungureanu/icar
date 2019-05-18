@@ -37,6 +37,8 @@ class DeleteDatabasePage(base_view.BaseView):
     def delete_database_callback(self):
         database_name = self.database_to_delete_variable.get()
 
+        assert isinstance(database_name, str)
+
         if database_name != 'Choose Database':
             icar.core.database_operations.delete_database(database_name)
             self.app.operation_result_message = 'Deleted database successfully.'

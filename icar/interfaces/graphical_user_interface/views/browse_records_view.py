@@ -73,9 +73,12 @@ class BrowseRecordsView(base_view.BaseView):
         filters = {
             'op_bool': self.operator_value.get()
         }
+        assert isinstance(filters['op_bool'], str)
         for column in self.filters:
             operator = self.filters[column]['operator_field'].get()
             value = self.filters[column]['value_field'].get()
+            assert operator in list(operators_map.keys()) + ['']
+            assert isinstance(value, str)
 
             if operator in operators_map and value:
                 filters[column] = {

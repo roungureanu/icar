@@ -4,6 +4,9 @@ import icar.helpers.constants as constants
 
 class Node(object):
     def __init__(self, element, children):
+        assert isinstance(element, str)
+        assert isinstance(children, list)
+
         self.element = element
         self.children = children
 
@@ -23,6 +26,7 @@ class Node(object):
 
 class TextNode(object):
     def __init__(self, text):
+        assert isinstance(text, str)
         self.text = text.strip()
 
     def __repr__(self):
@@ -37,15 +41,21 @@ class TextNode(object):
 
 class Parser(object):
     def __init__(self, file_path):
+        assert os.path.exists(file_path)
+
         with open(file_path, 'r') as handle:
             self.content = handle.read()
 
+        assert self.content.startswith('<')
+        assert self.content.endswith('>')
         if not self.content or self.content[0] != '<':
             raise Exception('Invalid XML. It must start with a valid XML element.')
 
         self.tree = self._build_tree(self.content)[0]
 
     def _build_tree(self, body):
+        assert isinstance(body, str)
+
         i = 0
         children = []
         child = ''

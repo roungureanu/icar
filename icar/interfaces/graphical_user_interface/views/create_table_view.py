@@ -136,6 +136,10 @@ class CreateTableView(base_view.BaseView):
             column_type = field['column_type_option_field_value'].get()
             column_size = field['column_size_entry_field'].get()
 
+            assert isinstance(column_name, str)
+            assert isinstance(column_type, str)
+            assert column_type in icar.helpers.constants.VALID_COLUMN_TYPES or column_type == ''
+
             if column_type == icar.helpers.constants.VALID_COLUMN_TYPES['NUMERIC']:
                 column_size = 0
             else:

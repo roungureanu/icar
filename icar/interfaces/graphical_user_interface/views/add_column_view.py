@@ -63,6 +63,10 @@ class AddColumnView(base_view.BaseView):
         column_name = self.new_column_entry.get()
         column_type = self.new_column_type.get()
 
+        assert isinstance(column_name, str)
+        assert isinstance(column_type, str)
+        assert column_type in icar.helpers.constants.VALID_COLUMN_TYPES
+
         if column_type == icar.helpers.constants.VALID_COLUMN_TYPES['NUMERIC']:
             column_size = 0
         else:

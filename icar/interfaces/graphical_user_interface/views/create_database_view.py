@@ -33,6 +33,9 @@ class CreateDatabasePage(base_view.BaseView):
 
     def create_database_callback(self):
         database_name = self.entry.get()
+
+        assert isinstance(database_name, str)
+
         if not database_name:
             self.app.operation_result_message = 'No database name given.'
         elif icar.core.database_operations.database_exists(database_name):

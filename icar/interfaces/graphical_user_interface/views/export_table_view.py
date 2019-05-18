@@ -48,6 +48,8 @@ class ExportTableView(base_view.BaseView):
         ).grid(row=1, column=1, sticky=tk.W + tk.E)
 
     def export_callback(self):
+        assert isinstance(self.export_path_string_variable.get(), str)
+
         if self.export_path_string_variable:
             unique_number = 1
             path = os.path.join(
@@ -65,6 +67,9 @@ class ExportTableView(base_view.BaseView):
             icar.interfaces.graphical_user_interface.views.main_view.MainPage(self.app)
         )
 
+        assert os.path.exists(path)
+
     def choose_directory_callback(self):
         path = tkinter.filedialog.askdirectory(parent=self, initialdir=os.getcwd(), title='Please select a directory')
+        assert isinstance(path, str)
         self.export_path_string_variable.set(path)

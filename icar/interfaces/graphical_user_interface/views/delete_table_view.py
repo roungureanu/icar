@@ -39,6 +39,9 @@ class DeleteTablePage(base_view.BaseView):
         database_name = self.app.current_open_database
         table_name = self.table_to_delete_variable.get()
 
+        assert isinstance(database_name, str)
+        assert isinstance(table_name, str)
+
         if table_name != 'Choose Table':
             icar.core.database_operations.delete_table(database_name, table_name)
             self.app.operation_result_message = 'Deleted table successfully.'

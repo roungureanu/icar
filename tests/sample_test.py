@@ -13,6 +13,8 @@ class BasicTest(unittest.TestCase):
 
     def test_difference(self):
         self.assertEqual(2 - 1, 1)
+        # raise Exception('asd')
+        self.fail('Ayy')
 
 
 if __name__ == '__main__':

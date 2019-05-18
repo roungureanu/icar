@@ -51,6 +51,8 @@ class RemoveColumnView(base_view.BaseView):
     def delete_column_callback(self):
         column_name = self.column_to_delete.get()
 
+        assert isinstance(column_name, str)
+
         if column_name:
             icar.core.database_operations.remove_column(
                 self.app.current_open_database,

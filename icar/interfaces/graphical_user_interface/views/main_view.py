@@ -119,6 +119,12 @@ class _Menu(tk.Frame):
 
     def table_operation_menu_callback(self, *args):
         option_picked = self.table_operation_menu_variable.get()
+
+        assert isinstance(option_picked, str)
+        assert option_picked in {'Insert Record', 'Browse Records', 'Delete Records',
+                                 'Update Records', 'Add Column', 'Remove Column',
+                                 'Export', 'Import'}
+
         if option_picked == 'Insert Record':
             self.app.replace_frame(insert_record_view.InsertRecordView(self.app))
         elif option_picked == 'Browse Records':
@@ -146,6 +152,7 @@ class _OperationResultMessage(tk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
+        assert isinstance(self.app.operation_result_message, str) or self.app.operation_result_message is None
         if self.app.operation_result_message:
             tk.Label(
                 self,
@@ -161,6 +168,8 @@ class _CurrentOpenDatabase(tk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
+        assert isinstance(self.app.current_open_database, str) or self.app.current_open_database is None
+
         if self.app.current_open_database:
             message = 'Currently using database: {}'.format(self.app.current_open_database)
         else:
@@ -180,6 +189,8 @@ class _CurrentOpenTable(tk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
+        assert isinstance(self.app.current_open_table, str) or self.app.current_open_database is None
+
         if self.app.current_open_table:
             message = 'Currently open table: {}'.format(self.app.current_open_table)
         else:

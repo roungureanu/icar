@@ -51,6 +51,7 @@ class TestCase(unittest.TestCase):
         icar.interfaces.graphical_user_interface.core.base_view.BaseView.__init__ = test_constructor
 
         app = unittest.mock.Mock(icar.interfaces.graphical_user_interface_application.Application)
+        app.replace_frame = unittest.mock.Mock()
         app.current_open_database = 'a'
         app.current_open_table = 'b'
         view = delete_table_view.DeleteTablePage(app)
@@ -68,6 +69,7 @@ class TestCase(unittest.TestCase):
         icar.interfaces.graphical_user_interface.core.base_view.BaseView.__init__ = test_constructor
 
         app = unittest.mock.Mock(icar.interfaces.graphical_user_interface_application.Application)
+        app.replace_frame = unittest.mock.Mock()
         app.current_open_database = 'a'
         app.current_open_table = 'a'
         view = delete_table_view.DeleteTablePage(app)
