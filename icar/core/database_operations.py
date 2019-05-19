@@ -9,26 +9,32 @@ import icar.helpers.constants as constants
 
 # CREATE DATABASE *DATABASE_NAME*
 def create_database(database_name):
-    if type(database_name) != str:
-        return (1, 'Error: Invalid database name.')
-    if not database_name.isalnum():
-        return (1, 'Error: Invalid database name.')
+    assert isinstance(database_name, str)
+    assert database_name.isalnum()
+    # if type(database_name) != str:
+    #     return (1, 'Error: Invalid database name.')
+    # if not database_name.isalnum():
+    #     return (1, 'Error: Invalid database name.')
     database_name = database_name.upper()
     dirPath = os.path.join(constants.DATABASES_PATH, database_name)
-    if os.path.exists(dirPath):
-        return (1, 'Error: Database already exists.')
-    try:
-        os.makedirs(dirPath)
-    except Exception:
-        return (1, 'Error: Couldn\'t create database. Please retry in a few minutes.')
+    assert not os.path.exists(dirPath)
+    os.makedirs(dirPath)
+    # if os.path.exists(dirPath):
+    #     return (1, 'Error: Database already exists.')
+    # try:
+    #     os.makedirs(dirPath)
+    # except Exception:
+    #     return (1, 'Error: Couldn\'t create database. Please retry in a few minutes.')
     return (0, 'Success: Database created.')
 
 
 def database_exists(database_name):
-    if type(database_name) != str:
-        return (1, 'Error: Invalid database name.')
-    if not database_name.isalnum():
-        return (1, 'Error: Invalid database name.')
+    assert isinstance(database_name, str)
+    assert database_name.isalnum()
+    # if type(database_name) != str:
+    #     return (1, 'Error: Invalid database name.')
+    # if not database_name.isalnum():
+    #     return (1, 'Error: Invalid database name.')
     return database_name.upper() in os.listdir(constants.DATABASES_PATH)
 
 
@@ -50,18 +56,22 @@ def list_tables(database_name):
 
 # DELETE DATABASE *DATABASE_NAME*
 def delete_database(database_name):
-    if type(database_name) != str:
-        return (1, 'Error: Invalid database name.')
-    if not database_name.isalnum():
-        return (1, 'Error: Invalid database name.')
+    assert isinstance(database_name, str)
+    assert database_name.isalnum()
+    # if type(database_name) != str:
+    #     return (1, 'Error: Invalid database name.')
+    # if not database_name.isalnum():
+    #     return (1, 'Error: Invalid database name.')
     database_name = database_name.upper()
     dirPath = os.path.join(constants.DATABASES_PATH, database_name)
-    if not os.path.exists(dirPath):
-        return (1, 'Error: Database doesn\'t exist.')
-    try:
-        shutil.rmtree(dirPath)
-    except Exception:
-        return (1, 'Error: Couldn\'t delete database. Please retry in a few minutes.')
+    assert os.path.exists(dirPath)
+    shutil.rmtree(dirPath)
+    # if not os.path.exists(dirPath):
+    #     return (1, 'Error: Database doesn\'t exist.')
+    # try:
+    #     shutil.rmtree(dirPath)
+    # except Exception:
+    #     return (1, 'Error: Couldn\'t delete database. Please retry in a few minutes.')
     return (0, 'Success: Database deleted.')
 
 
@@ -77,29 +87,37 @@ def delete_database(database_name):
 
 # CREATE TABLE *TABLE_NAME* (IN *DATABASE_NAME* ?) (*COLUMN_NAME_1* *COLUMN_TYPE_1*, ...)
 def create_table(database_name, table_name, columns, types, sizes):
-    if type(database_name) != str:
-        return (1, 'Error: Invalid database name.')
-    if not database_name.isalnum():
-        return (1, 'Error: Invalid database name.')
-    if type(table_name) != str:
-        return (1, 'Error: Invalid table name.')
-    if not table_name.isalnum():
-        return (1, 'Error: Invalid table name.')
+    assert isinstance(database_name, str)
+    assert database_name.isalnum()
+    assert isinstance(table_name, str)
+    assert table_name.isalnum()
+    # if type(database_name) != str:
+    #     return (1, 'Error: Invalid database name.')
+    # if not database_name.isalnum():
+    #     return (1, 'Error: Invalid database name.')
+    # if type(table_name) != str:
+    #     return (1, 'Error: Invalid table name.')
+    # if not table_name.isalnum():
+    #     return (1, 'Error: Invalid table name.')
     database_name = database_name.upper()
     table_name = table_name.upper()
-    if len(columns) != len(types):
-        return (1, 'Error: Invalid column types.')
+    assert len(columns) == len(types)
+    # if len(columns) != len(types):
+    #     return (1, 'Error: Invalid column types.')
     dirPath = os.path.join(constants.DATABASES_PATH, database_name)
-    if not os.path.exists(dirPath):
-        return (1, 'Error: Database doesn\'t exist.')
+    assert os.path.exists(dirPath)
+    # if not os.path.exists(dirPath):
+    #     return (1, 'Error: Database doesn\'t exist.')
     filePath = '{}.csv'.format(os.path.join(dirPath, table_name))
-    if os.path.exists(filePath):
-        return (1, 'Error: Table already exists.')
+    assert not os.path.exists(filePath)
+    # if os.path.exists(filePath):
+    #     return (1, 'Error: Table already exists.')
     with open(filePath, 'w') as f:
         text = ''
         for column in columns:
-            if type(column) != str:
-                return (1, 'Error: Invalid column name.')
+            assert isinstance(column, str)
+            # if type(column) != str:
+            #     return (1, 'Error: Invalid column name.')
             column = column.upper()
             text = '{}{},'.format(text, column)
         text = '{}\n'.format(text[:-1])
@@ -109,8 +127,9 @@ def create_table(database_name, table_name, columns, types, sizes):
         for i in range(len(columns)):
             types[i] = types[i].upper()
             columns[i] = columns[i].upper()
-            if types[i] not in constants.VALID_COLUMN_TYPES:
-                return (1, 'Error: Invalid type.')
+            assert types[i] in constants.VALID_COLUMN_TYPES
+            # if types[i] not in constants.VALID_COLUMN_TYPES:
+            #     return (1, 'Error: Invalid type.')
             if type(sizes[i]) != int:
                 sizes[i] = 0
             f.write('{},{},{}\n'.format(columns[i], types[i], sizes[i]))
@@ -119,95 +138,123 @@ def create_table(database_name, table_name, columns, types, sizes):
 
 # DELETE TABLE *TABLE_NAME* (IN *DATABASE_NAME* ?)
 def delete_table(database_name, table_name):
-    if type(database_name) != str:
-        return (1, 'Error: Invalid database name.')
-    if not database_name.isalnum():
-        return (1, 'Error: Invalid database name.')
-    if type(table_name) != str:
-        return (1, 'Error: Invalid table name.')
-    if not table_name.isalnum():
-        return (1, 'Error: Invalid table name.')
+    assert isinstance(database_name, str)
+    assert database_name.isalnum()
+    assert isinstance(table_name, str)
+    assert table_name.isalnum()
+    # if type(database_name) != str:
+    #     return (1, 'Error: Invalid database name.')
+    # if not database_name.isalnum():
+    #     return (1, 'Error: Invalid database name.')
+    # if type(table_name) != str:
+    #     return (1, 'Error: Invalid table name.')
+    # if not table_name.isalnum():
+    #     return (1, 'Error: Invalid table name.')
     database_name = database_name.upper()
     table_name = table_name.upper()
     dirPath = os.path.join(constants.DATABASES_PATH, database_name)
-    if not os.path.exists(dirPath):
-        return (1, 'Error: Database doesn\'t exist.')
+    assert(os.path.exists(dirPath))
+    # if not os.path.exists(dirPath):
+    #     return (1, 'Error: Database doesn\'t exist.')
     filePath = '{}.csv'.format(os.path.join(dirPath, table_name))
     metadataPath = '{}.metadata'.format(os.path.join(dirPath, table_name))
-    if not os.path.exists(filePath):
-        return (1, 'Error: Table doesn\'t exist.')
-    try:
-        os.remove(filePath)
-        os.remove(metadataPath)
-    except Exception:
-        return (1, 'Error: Couldn\'t delete table. Please retry in a few minutes.')
+    assert os.path.exists(filePath)
+    os.remove(filePath)
+    os.remove(metadataPath)
+    # if not os.path.exists(filePath):
+    #     return (1, 'Error: Table doesn\'t exist.')
+    # try:
+    #     os.remove(filePath)
+    #     os.remove(metadataPath)
+    # except Exception:
+    #     return (1, 'Error: Couldn\'t delete table. Please retry in a few minutes.')
     return (0, 'Success: Table deleted.')
 
 
 # RENAME TABLE *OLD_TABLE_NAME* INTO *NEW_TABLE_NAME* (IN *DATABASE_NAME* ?)
 def rename_table(database_name, old_table_name, new_table_name):
-    if type(database_name) != str:
-        return (1, 'Error: Invalid database name.')
-    if not database_name.isalnum():
-        return (1, 'Error: Invalid database name.')
-    if type(old_table_name) != str:
-        return (1, 'Error: Invalid old table name.')
-    if not old_table_name.isalnum():
-        return (1, 'Error: Invalid old table name.')
-    if type(new_table_name) != str:
-        return (1, 'Error: Invalid new table name.')
-    if not new_table_name.isalnum():
-        return (1, 'Error: Invalid new table name.')
+    assert isinstance(database_name, str)
+    assert database_name.isalnum()
+    assert isinstance(old_table_name, str)
+    assert old_table_name.isalnum()
+    assert isinstance(new_table_name, str)
+    assert new_table_name.isalnum()
+    # if type(database_name) != str:
+    #     return (1, 'Error: Invalid database name.')
+    # if not database_name.isalnum():
+    #     return (1, 'Error: Invalid database name.')
+    # if type(old_table_name) != str:
+    #     return (1, 'Error: Invalid old table name.')
+    # if not old_table_name.isalnum():
+    #     return (1, 'Error: Invalid old table name.')
+    # if type(new_table_name) != str:
+    #     return (1, 'Error: Invalid new table name.')
+    # if not new_table_name.isalnum():
+    #     return (1, 'Error: Invalid new table name.')
     database_name = database_name.upper()
     old_table_name = old_table_name.upper()
     new_table_name = new_table_name.upper()
     dirPath = os.path.join(constants.DATABASES_PATH, database_name)
-    if not os.path.exists(dirPath):
-        return (1, 'Error: Database doesn\'t exist.')
+    assert os.path.exists(dirPath)
+    # if not os.path.exists(dirPath):
+    #     return (1, 'Error: Database doesn\'t exist.')
     filePath = '{}.csv'.format(os.path.join(dirPath, old_table_name))
     metadataPath = '{}.metadata'.format(os.path.join(dirPath, old_table_name))
-    if not os.path.exists(filePath):
-        return (1, 'Error: Old table doesn\'t exist.')
+    assert os.path.exists(filePath)
+    # if not os.path.exists(filePath):
+    #     return (1, 'Error: Old table doesn\'t exist.')
     newFilePath = '{}.csv'.format(os.path.join(dirPath, new_table_name))
     newMetadataPath = '{}.metadata'.format(os.path.join(dirPath, new_table_name))
-    if os.path.exists(newFilePath):
-        return (1, 'Error: New table already exists.')
-    try:
-        os.rename(filePath, newFilePath)
-        os.rename(metadataPath, newMetadataPath)
-    except Exception:
-        return (1, 'Error: Couldn\'t rename table. Please retry in a few minutes.')
+    assert not os.path.exists(newFilePath)
+    os.rename(filePath, newFilePath)
+    os.rename(metadataPath, newMetadataPath)
+    # if os.path.exists(newFilePath):
+    #     return (1, 'Error: New table already exists.')
+    # try:
+    #     os.rename(filePath, newFilePath)
+    #     os.rename(metadataPath, newMetadataPath)
+    # except Exception:
+    #     return (1, 'Error: Couldn\'t rename table. Please retry in a few minutes.')
     return (0, 'Success: Table renamed.')
 
 
 def remove_column(database_name, table_name, column_name):
-    if type(database_name) != str:
-        return (1, 'Error: Invalid database name.')
-    if not database_name.isalnum():
-        return (1, 'Error: Invalid database name.')
-    if type(table_name) != str:
-        return (1, 'Error: Invalid table name.')
-    if not table_name.isalnum():
-        return (1, 'Error: Invalid table name.')
-    if type(column_name) != str:
-        return (1, 'Error: Invalid column name.')
-    if not column_name.isalnum():
-        return (1, 'Error: Invalid column name.')
+    assert isinstance(database_name, str)
+    assert database_name.isalnum()
+    assert isinstance(table_name, str)
+    assert table_name.isalnum()
+    assert isinstance(column_name, str)
+    assert column_name.isalnum()
+    # if type(database_name) != str:
+    #     return (1, 'Error: Invalid database name.')
+    # if not database_name.isalnum():
+    #     return (1, 'Error: Invalid database name.')
+    # if type(table_name) != str:
+    #     return (1, 'Error: Invalid table name.')
+    # if not table_name.isalnum():
+    #     return (1, 'Error: Invalid table name.')
+    # if type(column_name) != str:
+    #     return (1, 'Error: Invalid column name.')
+    # if not column_name.isalnum():
+    #     return (1, 'Error: Invalid column name.')
     database_name = database_name.upper()
     table_name = table_name.upper()
     column_name = column_name.upper()
     dirPath = os.path.join(constants.DATABASES_PATH, database_name)
-    if not os.path.exists(dirPath):
-        return (1, 'Error: Database doesn\'t exist.')
+    assert os.path.exists(dirPath)
+    # if not os.path.exists(dirPath):
+    #     return (1, 'Error: Database doesn\'t exist.')
     filePath = '{}.csv'.format(os.path.join(dirPath, table_name))
-    if not os.path.exists(filePath):
-        return (1, 'Error: Table doesn\'t exist.')
+    assert os.path.exists(filePath)
+    # if not os.path.exists(filePath):
+    #     return (1, 'Error: Table doesn\'t exist.')
     with open(filePath, 'r') as f:
         data = f.read().splitlines()
     header = data[0]
     columns = header.split(',')
-    if column_name not in columns:
-        return (1, 'Error: Column doesn\'t exist.')
+    assert column_name in columns
+    # if column_name not in columns:
+    #     return (1, 'Error: Column doesn\'t exist.')
     index = columns.index(column_name)
     for i in range(len(data)):
         elems = data[i].split(',')
@@ -224,7 +271,7 @@ def remove_column(database_name, table_name, column_name):
         elems = metadata[i].split(',')
         if elems[0] == column_name:
             break
-    del metadata[i]  # TODO: What is this doing?
+    del metadata[i]
     metadata = '\n'.join(metadata)
     with open(metadataPath, 'w') as f:
         f.write(metadata)
@@ -232,40 +279,52 @@ def remove_column(database_name, table_name, column_name):
 
 
 def rename_column(database_name, table_name, old_column_name, new_column_name):
-    if type(database_name) != str:
-        return (1, 'Error: Invalid database name.')
-    if not database_name.isalnum():
-        return (1, 'Error: Invalid database name.')
-    if type(table_name) != str:
-        return (1, 'Error: Invalid table name.')
-    if not table_name.isalnum():
-        return (1, 'Error: Invalid table name.')
-    if type(old_column_name) != str:
-        return (1, 'Error: Invalid old column name.')
-    if not old_column_name.isalnum():
-        return (1, 'Error: Invalid old column name.')
-    if type(new_column_name) != str:
-        return (1, 'Error: Invalid new column name.')
-    if not new_column_name.isalnum():
-        return (1, 'Error: Invalid new column name.')
+    assert isinstance(database_name, str)
+    assert database_name.isalnum()
+    assert isinstance(table_name, str)
+    assert table_name.isalnum()
+    assert isinstance(old_column_name, str)
+    assert old_column_name.isalnum()
+    assert isinstance(new_column_name, str)
+    assert new_column_name.isalnum()
+    # if type(database_name) != str:
+    #     return (1, 'Error: Invalid database name.')
+    # if not database_name.isalnum():
+    #     return (1, 'Error: Invalid database name.')
+    # if type(table_name) != str:
+    #     return (1, 'Error: Invalid table name.')
+    # if not table_name.isalnum():
+    #     return (1, 'Error: Invalid table name.')
+    # if type(old_column_name) != str:
+    #     return (1, 'Error: Invalid old column name.')
+    # if not old_column_name.isalnum():
+    #     return (1, 'Error: Invalid old column name.')
+    # if type(new_column_name) != str:
+    #     return (1, 'Error: Invalid new column name.')
+    # if not new_column_name.isalnum():
+    #     return (1, 'Error: Invalid new column name.')
     database_name = database_name.upper()
     table_name = table_name.upper()
     old_column_name = old_column_name.upper()
     new_column_name = new_column_name.upper()
     dirPath = os.path.join(constants.DATABASES_PATH, database_name)
-    if not os.path.exists(dirPath):
-        return (1, 'Error: Database doesn\'t exist.')
+    assert os.path.exists(dirPath)
+    # if not os.path.exists(dirPath):
+    #     return (1, 'Error: Database doesn\'t exist.')
     filePath = '{}.csv'.format(os.path.join(dirPath, table_name))
-    if not os.path.exists(filePath):
-        return (1, 'Error: Table doesn\'t exist.')
+    assert os.path.exists(filePath)
+    # if not os.path.exists(filePath):
+    #     return (1, 'Error: Table doesn\'t exist.')
     with open(filePath, 'r') as f:
         data = f.read().splitlines()
     header = data[0]
     columns = header.split(',')
-    if old_column_name not in columns:
-        return (1, 'Error: Column doesn\'t exist.')
-    if new_column_name in columns:
-        return (1, 'Error: Column already exists.')
+    assert old_column_name in columns
+    assert new_column_name not in columns
+    # if old_column_name not in columns:
+    #     return (1, 'Error: Column doesn\'t exist.')
+    # if new_column_name in columns:
+    #     return (1, 'Error: Column already exists.')
     index = columns.index(old_column_name)
     columns[index] = new_column_name
     header = ','.join(columns)
@@ -290,38 +349,48 @@ def rename_column(database_name, table_name, old_column_name, new_column_name):
 
 
 def add_column(database_name, table_name, column_name, column_type, column_size):
-    if type(database_name) != str:
-        return (1, 'Error: Invalid database name.')
-    if not database_name.isalnum():
-        return (1, 'Error: Invalid database name.')
-    if type(table_name) != str:
-        return (1, 'Error: Invalid table name.')
-    if not table_name.isalnum():
-        return (1, 'Error: Invalid table name.')
-    if type(column_name) != str:
-        return (1, 'Error: Invalid column name.')
-    if not column_name.isalnum():
-        return (1, 'Error: Invalid column name.')
+    assert isinstance(database_name, str)
+    assert database_name.isalnum()
+    assert isinstance(table_name, str)
+    assert table_name.isalnum()
+    assert isinstance(column_name, str)
+    assert column_name.isalnum()
+    # if type(database_name) != str:
+    #     return (1, 'Error: Invalid database name.')
+    # if not database_name.isalnum():
+    #     return (1, 'Error: Invalid database name.')
+    # if type(table_name) != str:
+    #     return (1, 'Error: Invalid table name.')
+    # if not table_name.isalnum():
+    #     return (1, 'Error: Invalid table name.')
+    # if type(column_name) != str:
+    #     return (1, 'Error: Invalid column name.')
+    # if not column_name.isalnum():
+    #     return (1, 'Error: Invalid column name.')
     database_name = database_name.upper()
     table_name = table_name.upper()
     column_name = column_name.upper()
     column_type = column_type.upper()
-    if column_type not in constants.VALID_COLUMN_TYPES:
-        return (1, 'Error: Invalid type.')
+    assert column_type in constants.VALID_COLUMN_TYPES
+    # if column_type not in constants.VALID_COLUMN_TYPES:
+    #     return (1, 'Error: Invalid type.')
     if type(column_size) != int or column_size < 0:
         column_size = 0
     dirPath = os.path.join(constants.DATABASES_PATH, database_name)
-    if not os.path.exists(dirPath):
-        return (1, 'Error: Database doesn\'t exist.')
+    assert os.path.exists(dirPath)
+    # if not os.path.exists(dirPath):
+    #     return (1, 'Error: Database doesn\'t exist.')
     filePath = '{}.csv'.format(os.path.join(dirPath, table_name))
-    if not os.path.exists(filePath):
-        return (1, 'Error: Table doesn\'t exist.')
+    assert os.path.exists(filePath)
+    # if not os.path.exists(filePath):
+    #     return (1, 'Error: Table doesn\'t exist.')
     with open(filePath, 'r') as f:
         data = f.read().splitlines()
     header = data[0]
     columns = header.split(',')
-    if column_name in columns:
-        return (1, 'Error: Column already exists.')
+    assert column_name not in columns
+    # if column_name in columns:
+    #     return (1, 'Error: Column already exists.')
     for i in range(len(data)):
         if i == 0:
             data[i] = '{},{}'.format(data[i], column_name)
