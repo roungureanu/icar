@@ -48,15 +48,33 @@ class Application(object):
         # CREATE DATABASE *DATABASE_NAME*
         if command.startswith('create database'):
             m = re.search("create database ([a-z 0-9]+)", command)
+            try:
+                assert m != None
+            except Exception as exc:
+                return "Parse exception"
+
             name = m.group(1)
-            result = database.create_database(name)
+            
+            try:
+                result = database.create_database(name)
+            except Exception as exc:
+                return "Exception: Database already exists " + str(exc)
+            
             return result[1]
 
         # DELETE DATABASE *DATABASE_NAME*
         if command.startswith('delete database'):
             m = re.search("delete database ([a-z 0-9]+)", command)
+            try:
+                assert m != None
+            except Exception as exc:
+                return "Parse exception"
+
             name = m.group(1)
-            result = database.delete_database(name)
+            try:
+                result = database.delete_database(name)
+            except Exception as exc:
+                return "Exception: Specified database does not exist " + str(exc)
             return result[1]
 
         # CREATE TABLE *TABLE_NAME* (IN *DATABASE_NAME* ?) (*COLUMN_NAME_1* *COLUMN_TYPE_1*, ...)
@@ -78,8 +96,11 @@ class Application(object):
                 types.append(field[1])
                 sizes.append(int(field[2]))
 
-            result = database.create_table(
-                database_name, table_name, columns, types, sizes)
+            try:
+                result = database.create_table(
+                    database_name, table_name, columns, types, sizes)
+            except Exception as exc:
+                return "Exception: Could not create table " + str(exc)
             return result[1]
 
         # DELETE TABLE *TABLE_NAME* (IN *DATABASE_NAME* ?)
@@ -88,8 +109,11 @@ class Application(object):
                 "delete table (?P<t_name>.*) in (?P<d_name>.*)", command)
             table_name = m.group('t_name')
             database_name = m.group('d_name')
+            try:
+                result = database.delete_table(database_name, table_name)
+            except Exception as exc:
+                return "Exception: Could not delete table " + str(exc) 
 
-            result = database.delete_table(database_name, table_name)
             return result[1]
 
         # RENAME TABLE *OLD_TABLE_NAME* INTO *NEW_TABLE_NAME* (IN *DATABASE_NAME* ?)
@@ -100,8 +124,12 @@ class Application(object):
             old_table_name = m.group('old_t_name')
             new_table_name = m.group('new_t_name')
 
-            result = database.rename_table(
-                database_name, old_table_name, new_table_name)
+            try:
+                result = database.rename_table(
+                    database_name, old_table_name, new_table_name)
+            except Exception as exc:
+                return "Exception: Could not rename table " + str(exc)
+
             return result[1]
 
         # ALTER TABLE *TABLE_NAME* IN *DATABASE_NAME* DROP COLUMN *COLUMN_NAME*
@@ -112,8 +140,12 @@ class Application(object):
             database_name = m.group('d_name')
             column_name = m.group('c_name')
 
-            result = database.remove_column(
-                database_name, table_name, column_name)
+            try:
+                result = database.remove_column(
+                    database_name, table_name, column_name)
+            except Exception as exc:
+                return "Exception: Could not drop column " + str(exc)
+
             return result[1]
 
         # ALTER TABLE *TABLE_NAME* IN *DATABASE_NAME* ADD COLUMN *COLUMN_NAME* *DATA_TYPE* *COLUMN_SIZE*
@@ -131,9 +163,13 @@ class Application(object):
                 return "Invalid column data."
 
             column_name, column_type, column_size = col_name_type
-            print(col_name_type)
-            result = database.add_column(
-                database_name, table_name, column_name, column_type, column_size)
+            
+            try:
+                result = database.add_column(
+                    database_name, table_name, column_name, column_type, column_size)
+            except Exception as exc:
+                return "Exception: Could not add column " + str(exc)
+
             return result[1]
 
         # ALTER TABLE *TABLE_NAME* IN *DATABASE_NAME* RENAME COLUMN *OLD_COLUMN_NAME* TO *NEW_COLUMN_NAME*
@@ -145,8 +181,12 @@ class Application(object):
             old_column_name = m.group('old_c_name')
             new_column_name = m.group('new_c_name')
 
-            result = database.rename_column(
-                database_name, table_name, old_column_name, new_column_name)
+            try:
+                result = database.rename_column(
+                    database_name, table_name, old_column_name, new_column_name)
+            except Exception as exc:
+                return "Exception: Could not rename column " + str(exc)
+
             return result[1]
 
         # SET DATABASE *DATABASE_NAME*
@@ -167,8 +207,12 @@ class Application(object):
                        for it in m.group('columns').split(',')]
             values = [it.strip() for it in m.group('values').split(',')]
 
-            ops = table_operations.TableOps(database_name, table_name)
-            result = ops.insert(columns, values)
+            try:
+                ops = table_operations.TableOps(database_name, table_name)
+                result = ops.insert(columns, values)
+            except Exception as exc:
+                return str(exc)
+
             ret = "TABLE: {}\n".format(table_name)
             for row in result:
                 for col in row:
@@ -191,8 +235,11 @@ class Application(object):
 
             filters = self.create_filters(conditions)
 
-            ops = table_operations.TableOps(database_name, table_name)
-            result = ops.select(filters, columns)
+            try:
+                ops = table_operations.TableOps(database_name, table_name)
+                result = ops.select(filters, columns)
+            except Exception as exc:
+                return "Exception: " + str(exc)
 
             ret = "TABLE: {}\n".format(table_name)
             for row in result:
@@ -223,8 +270,11 @@ class Application(object):
 
             print(filters)
 
-            ops = table_operations.TableOps(database_name, table_name)
-            result = ops.update(filters, columns, values)
+            try:
+                ops = table_operations.TableOps(database_name, table_name)
+                result = ops.update(filters, columns, values)
+            except Exception as exc:
+                return str(exc)
 
             ret = "TABLE: {}\n".format(table_name)
             for row in result:
@@ -242,8 +292,11 @@ class Application(object):
             table_name = m.group('t_name')
             path = m.group('path')
 
-            ops = table_operations.TableOps(database_name, table_name)
-            result = ops.export(path)
+            try:
+                ops = table_operations.TableOps(database_name, table_name)
+                result = ops.export(path)
+            except Exception as exc:
+                return str(exc)
 
             return "Export done at path {}".format(path)
 
@@ -254,9 +307,12 @@ class Application(object):
             table_name = m.group('t_name')
             path = m.group('path')
 
-            ops = table_operations.TableOps(database_name, table_name)
-            result = ops.import_(path)
-
+            try:
+                ops = table_operations.TableOps(database_name, table_name)
+                result = ops.import_(path)
+            except Exception as exc:
+                return str(exc)
+                
             return "Imported table at path {}".format(path)
 
     def should_stop(self):
